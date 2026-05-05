@@ -1,0 +1,19 @@
+# patchbay.yml — project config for the patchbay Claude plugin
+# Copy this file to patchbay.yml at your project root and adjust for your layout.
+# All fields are optional; patchbay uses the defaults shown in comments when absent.
+
+# Folder roots, relative to this file's directory.
+gear_root: Gear           # default: Gear/
+software_root: Software   # default: Software/
+songs_root: Songs         # default: Songs/
+artists_root: Artists     # default: Artists/
+
+# Sell/purge list — read by liner-notes GAS mode to suggest funded swaps.
+# If this file is missing, GAS mode shows standalone acquisitions only.
+purge_list: Purge.md      # default: Purge.md
+
+# GAS mode (Gear Acquisition Syndrome)
+# false (default): optimize for substitution from existing gear
+# true: surface honest acquisition options (new purchases + funded swaps from purge list)
+# Override per-call with: "liner notes on Creep with GAS on"
+gas_mode: false
