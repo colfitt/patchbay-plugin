@@ -1,0 +1,11 @@
+{
+  "name": "patchbay",
+  "description": "A Claude Code plugin for musicians. Inventory your gear, research tones, design patches, and chase the sounds behind the songs you love.",
+  "version": "0.1.0",
+  "author": {
+    "name": "colfitt",
+    "email": "colfitt@gmail.com"
+  },
+  "license": "TBD",
+  "keywords": ["music", "gear", "studio", "patches", "tone-research", "pedals"]
+}
