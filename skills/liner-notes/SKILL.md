@@ -24,7 +24,9 @@ Activate on any of these patterns:
 
 **Artist-only requests** ("the Bonham drum sound", "Jonny Greenwood's tone") — route to
 `Artists/<Artist>/ArtistProfile.md` flow with broader scope (rig over time, not one recording).
-Process is the same but target is `artists_root/<Artist>/ArtistProfile.md`.
+Process is the same but target is `<artists_root>/<Artist>/ArtistProfile.md`.
+
+> **Note:** Resolve `artists_root` from `patchbay.yml` `artists_root` key, or default to `Artists/`.
 
 ## Process
 
@@ -63,6 +65,11 @@ If the file exists but appears corrupted (no frontmatter, unreadable structure):
 
 ### Step 3: Gather research
 
+**Re-run mode (from Step 2):**
+- **Refresh** (option 1): proceed normally — re-fetch all sources, overwrite source files.
+- **Extend** (option 2): skip re-fetching sources already present in `sources/`; only fetch new sources.
+- **Start over** (option 4): proceed normally — treat as a fresh run, re-fetch all sources.
+
 Follow strategies in `references/sources.md`. Attempt all six source types in order:
 1. Equipboard
 2. Premier Guitar
@@ -70,6 +77,8 @@ Follow strategies in `references/sources.md`. Attempt all six source types in or
 4. Tape Op
 5. YouTube rig rundowns (via `add-youtube` CLI)
 6. General web fallback
+
+Proceed through all six source types regardless of whether each yields results. Only skip a source type on fetch failure or garbage/unrelated response — no results from a search query is not a skip condition; try the fallback query specified in `references/sources.md` first.
 
 Create `<song-folder>/sources/` directory. Save each successful fetch as
 `sources/<site>-<YYYY-MM-DD>.md` with required frontmatter.
@@ -144,6 +153,8 @@ Determine GAS mode:
 | Off | Real gap (≥1 category has no owned match that meaningfully affects the sound) | One-line nudge: "GAS mode is off. To fully match this sound you'd need [category list] you don't currently own. Toggle GAS on for specifics." Cosmetic mismatches (slightly different fuzz model when user owns a fuzz) do NOT count as a real gap. |
 | On | Any | Full section: read `Purge.md` (from `patchbay.yml` `purge_list`) for funded swaps + standalone acquisitions + wishlist additions, with reasoning per item. If Purge.md not found: standalone acquisitions only; note "No purge list found — run `patchbay:purge` to build one for funded swap suggestions." |
 
+> **Note on GAS-off nudge placement:** The nudge goes in `## Applied` as the final line, after per-item substitution prose. It does not replace the per-item no-match lines — it supplements them with a summary and the toggle offer.
+
 ### Step 9: Apply corrections (re-run only)
 
 If this is a re-run and `## Corrections` has user content:
@@ -207,11 +218,11 @@ gear_referenced:
 - *<Follow-up prompt 2 — cover-friendly version>*
 - *<Follow-up prompt 3 — creative what-if swap>*
 
-## Corrections
-<!-- User adds corrections here. This section is never touched by liner-notes on re-run. -->
-
 ## Gear Acquisition
 <!-- GAS-gated. Omit entirely when GAS off and no real inventory gap. -->
+
+## Corrections
+<!-- User adds corrections here. This section is never touched by liner-notes on re-run. -->
 ```
 
 ## Failure mode reference
@@ -231,3 +242,4 @@ gear_referenced:
 | Sample-based / electronic track | Reframe; ask if user wants production/synth research instead |
 | Found-object / experimental | Treat seriously; found-object technique notes in Research |
 | `## Applied` inventory gap nudge | One-line GAS-off nudge for real gaps; silence for cosmetic ones |
+| `## Where next` prompts for non-pedal track | Adapt the 3 prompts to the actual track type (e.g., for found-object tracks: "dial-in the room mic setup", "stripped-down version", "what if you tried X technique") |

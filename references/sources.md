@@ -95,18 +95,3 @@ When two sources disagree on a gear claim, surface the conflict explicitly in `#
 > "Pedal: DigiTech Whammy II ([equipboard-2026-05-05.md](sources/equipboard-2026-05-05.md)) vs. Whammy IV ([premier-guitar-2026-05-05.md](sources/premier-guitar-2026-05-05.md)) — see Corrections to resolve."
 
 Do not pick a winner. Do not average. Let the user correct via `## Corrections`.
-
-## Steps
-
-1. Write the file `references/sources.md` with the exact content above
-2. Verify: `grep "^### " references/sources.md` — must show exactly 6 `###` strategy headers
-3. Verify the "Conflict handling" section is present
-4. Commit: `git add references/sources.md && git commit -m "feat: add references/sources.md (per-site fetch strategies)"`
-
-## Status reporting
-
-End with one of:
-- `STATUS: DONE`
-- `STATUS: DONE_WITH_CONCERNS: <details>`
-- `STATUS: NEEDS_CONTEXT: <question>`
-- `STATUS: BLOCKED: <reason>`
