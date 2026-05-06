@@ -1,0 +1,14 @@
+{
+  "name": "patchbay-local",
+  "owner": {
+    "name": "colfitt",
+    "email": "colfitt@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "patchbay",
+      "description": "A Claude Code plugin for musicians. Inventory your gear, research tones, design patches, and chase the sounds behind the songs you love.",
+      "source": "./"
+    }
+  ]
+}
