@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spike 003 — tiered web ingest (Equipboard + Reddit)</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --panel: #18181b;
+    --panel-2: #1f1f23;
+    --border: #2a2a30;
+    --text: #e4e4e7;
+    --muted: #a1a1aa;
+    --accent: #f97316;
+    --eb: #7c3aed;
+    --eb-light: #c4b5fd;
+    --reddit: #f97316;
+    --reddit-light: #fed7aa;
+    --cross: #14532d;
+    --cross-text: #86efac;
+    --warn: #7f1d1d;
+    --warn-text: #fca5a5;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font: 14px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  }
+  header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  h1 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+  .sub { color: var(--muted); font-size: 12px; max-width: 1100px; }
+  .gear-bar {
+    padding: 14px 24px;
+    background: linear-gradient(90deg, var(--panel), var(--panel-2));
+    border-bottom: 1px solid var(--border);
+  }
+  .gear-bar h2 { margin: 0; font-size: 14px; font-weight: 600; }
+  .gear-bar .meta { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .alert {
+    margin: 14px 24px;
+    padding: 12px 16px;
+    background: var(--warn);
+    border-left: 3px solid var(--warn-text);
+    border-radius: 4px;
+    font-size: 13px;
+    color: #fee2e2;
+  }
+  .alert strong { color: #fef2f2; }
+  main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+    padding: 20px 24px;
+    max-width: 1700px;
+    margin: 0 auto;
+  }
+  .pane h2 {
+    margin: 0 0 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 10px;
+  }
+  .badge.eb { background: var(--eb); color: white; }
+  .badge.reddit { background: var(--reddit); color: #0f0f10; }
+  .badge.tier-0 { background: var(--warn); color: var(--warn-text); }
+  .badge.tier-1 { background: var(--cross); color: var(--cross-text); }
+  .badge.cross { background: var(--cross); color: var(--cross-text); }
+  .chunk {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .chunk-meta {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 10px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .chunk-id {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    margin-left: auto; opacity: 0.7;
+  }
+  .chunk-type {
+    color: var(--text);
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+  }
+  .chunk-body {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .chunk-body pre {
+    background: #0a0a0c;
+    padding: 8px 10px; border-radius: 4px;
+    font-size: 11px; overflow-x: auto;
+    color: var(--muted);
+    white-space: pre-wrap;
+  }
+  .field { margin: 6px 0; }
+  .field .label {
+    font-size: 11px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.04em; font-weight: 600;
+  }
+  .field .value { font-size: 13px; }
+  .quote {
+    border-left: 2px solid var(--muted);
+    padding: 4px 12px;
+    margin: 8px 0;
+    color: var(--muted);
+    font-style: italic;
+    font-size: 12px;
+  }
+  .cross-source {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: var(--cross);
+    border-radius: 4px;
+    border-left: 3px solid var(--cross-text);
+    font-size: 12px;
+    color: #d1fae5;
+  }
+  .cross-source .label {
+    color: var(--cross-text); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em; font-size: 10px;
+    margin-bottom: 4px;
+  }
+  .provenance {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    font-size: 10px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .provenance a { color: var(--accent); text-decoration: none; }
+  .provenance a:hover { text-decoration: underline; }
+  .filter-bar {
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .filter-bar .label { color: var(--muted); font-size: 12px; }
+  .filter-bar button {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .filter-bar button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0f0f10;
+    font-weight: 600;
+  }
+  .summary-strip {
+    display: flex; gap: 24px;
+    padding: 12px 24px;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .summary-strip strong { color: var(--text); font-size: 16px; }
+  .summary-strip span { display: flex; flex-direction: column; gap: 2px; }
+  ul.compact { margin: 4px 0; padding-left: 18px; }
+  ul.compact li { margin: 2px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Spike 003 — tiered web ingest</h1>
+  <div class="sub">Test gear: <strong>Chase Bliss Audio Clean</strong>. Tier-1 static fetch tried against both Equipboard and Reddit. Equipboard returned 403 (Cloudflare) and was logged to <code>failures.log</code>; the user-pasted DOM content was used to produce chunks. Reddit returned 200 via the <code>.json</code> suffix and was chunked from the JSON response.</div>
+</header>
+<div class="gear-bar">
+  <h2>Chase Bliss Audio Clean</h2>
+  <div class="meta">Compressor pedal · $350 · Made in USA · 2024 - 2025 · Standard pedal format · 3 verified artists · 4 community setups</div>
+</div>
+<div class="alert">
+  <strong>Tier-1 fetch failure logged</strong> · <code>equipboard.com/items/chase-bliss-audio-clean</code> returned 403 with a Cloudflare JS challenge. Logged to <code>failures.log</code> with <code>suggested_escalation: 2</code>. User can escalate to tier-2 (Claude_in_Chrome) on demand. For the spike, the user manually pasted the page DOM text — chunks below are tagged <span class="badge tier-0">tier 0 / user-pasted</span>.
+</div>
+<div class="summary-strip">
+  <span><strong id="eb-count">10</strong> EB chunks</span>
+  <span><strong id="rd-count">7</strong> Reddit chunks</span>
+  <span><strong id="cross-count">2</strong> cross-source matches</span>
+  <span><strong id="ext-count">0</strong> external resources cited</span>
+</div>
+<div class="filter-bar">
+  <span class="label">Filter:</span>
+  <button data-filter="all" class="active">All</button>
+  <button data-filter="artist_usage">Artist usage</button>
+  <button data-filter="cross_ref">Cross-refs</button>
+  <button data-filter="review_section,review_subsection">Reviews</button>
+  <button data-filter="cross-source-only">Cross-source matches only</button>
+</div>
+<main>
+  <div class="pane">
+    <h2><span class="badge eb">Equipboard</span> · 10 chunks · tier 0 (user-pasted)</h2>
+    <div id="eb-chunks"></div>
+  </div>
+  <div class="pane">
+    <h2><span class="badge reddit">Reddit</span> · 7 chunks · tier 1 (.json endpoint)</h2>
+    <div id="reddit-chunks"></div>
+  </div>
+</main>
+<script>
+const EB = [
+  {
+    "id": "eb-cb-clean-c01",
+    "type": "description",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": "The Chase Bliss Audio Clean is a compressor pedal with all-analog signal path complemented by digital controls. Hybrid design provides flexibility and precision without compromising sound integrity. Targets both subtle compression and pronounced effects. Suited for studio and live performance environments.\n\nKey Features: All-analog signal path with digital controls; versatile compression for various styles; intuitive UI; high-quality components; pedalboard-friendly.",
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#description",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED (tier 1 fetch returned 403 Cloudflare)"
+    }
+  },
+  {
+    "id": "eb-cb-clean-c02",
+    "type": "product_specs",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "brand": "Chase Bliss Audio",
+      "model": "Clean",
+      "finish": "White",
+      "year": "2024 - 2025",
+      "made_in": "United States",
+      "categories": ["Compressor Pedals"],
+      "pedal_format": "Standard",
+      "price_tier": "High-end",
+      "average_price_usd": 350,
+      "current_price_range_usd": [350, 350]
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#product-specs",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-c03",
+    "type": "faq",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": [
+      { "q": "Is the Chase Bliss Audio Clean compressor pedal suitable for both live performance and studio use?", "a": "Yes — designed for both, with stereo, analog, two-stage compression." },
+      { "q": "Does the Chase Bliss Audio Clean work well with both electric guitar and bass?", "a": "Yes — versatile for both, providing smooth compression and enhanced dynamic range." },
+      { "q": "What power supply does the Chase Bliss Audio Clean require?", "a": "Standard 9V DC, negative center pin." },
+      { "q": "Can the Chase Bliss Audio Clean be used in a stereo setup?", "a": "Yes — it's a stereo compressor." },
+      { "q": "How does the Chase Bliss Audio Clean differ from other compressor pedals?", "a": "Innovative two-stage compression and analog circuitry; unique blend of warmth and clarity." }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#faqs",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-artist-rhett",
+    "type": "artist_usage",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "artist": "Rhett Shull",
+      "artist_roles": ["Guitarist", "Music Producer"],
+      "verification_type": "youtube",
+      "verification_note": "Video review by Rhett Shull on his channel: 'How Did They Even Think Of This? Chase Bliss Clean'",
+      "verbatim_quote": "Okay, so to start off with, Clean is without a doubt an amazing sounding compressor. It's really versatile. It's actually quite easy to use. I think it's pretty beginner-friendly... if you're someone that likes to use pedals for sound design or to mix with, the Clean is an amazing option because it's true stereo in and out. You can actually use it like an outboard rack compressor like my Distressors up there, for example. You can put drums through this, put vocals through this, put your entire mix through this, and use it to do basic compression, gluing things together, to hard slammed limiting, to adding Distortion to EQ — like it's a really powerful tool for mixing and for sound design.",
+      "summary": "Rhett positions Clean as an amazing compressor for sound designers and mix-engineers, NOT for guitarists who only want subtle dynamics-evening compression — for that he says Clean is 'underutilized' and recommends UA 1176, JHS Pulp N Peel as cheaper alternatives. Highlights features: stereo in/out, MIDI in/out, expression+CV, side-chain input.",
+      "alternatives_he_recommends": ["UA 1176", "JHS Pulp N Peel"]
+    },
+    "citation_targets": [
+      { "type": "youtube", "creator": "Rhett Shull", "video_title": "How Did They Even Think Of This? Chase Bliss Clean" }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#artist-usage > Rhett Shull",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-artist-emily-green",
+    "type": "artist_usage",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "artist": "Emily Green",
+      "artist_roles": ["Guitarist"],
+      "associated_act": "Geese",
+      "verification_type": "photo",
+      "verification_note": "Visible on her pedalboard from the London show",
+      "summary": "Confirmed live use; pedalboard inclusion."
+    },
+    "citation_targets": [
+      { "type": "live-photo", "context": "Geese — London show pedalboard photo" }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#artist-usage > Emily Green",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-artist-emily-hopkins",
+    "type": "artist_usage",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "artist": "Emily Hopkins",
+      "artist_roles": ["Podcasters & Streamers", "Harpist"],
+      "associated_act": "Obverse.",
+      "verification_type": "youtube",
+      "verification_note": "Demo video by Emily Hopkins of the Chase Bliss Clean compressor",
+      "summary": "Harpist demos the pedal — notable because most compressor pedal demos are guitar-focused; harp use case validates Clean's versatility for non-traditional inputs."
+    },
+    "citation_targets": [
+      { "type": "youtube", "creator": "Emily Hopkins", "video_title": "Chase Bliss Clean demo (harp)" }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#artist-usage > Emily Hopkins",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-genres",
+    "type": "genre_usage",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": [
+      { "genre": "Rock", "weight": 14 },
+      { "genre": "Electronic", "weight": 9 },
+      { "genre": "Indie Rock", "weight": 7 },
+      { "genre": "Alternative Rock", "weight": 6 },
+      { "genre": "Funk / Soul", "weight": 5 },
+      { "genre": "Pop", "weight": 4 },
+      { "genre": "Jazz", "weight": 4 },
+      { "genre": "Hip Hop", "weight": 3 },
+      { "genre": "Ambient", "weight": 3 },
+      { "genre": "Experimental", "weight": 3 }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#genre-usage",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-used-with",
+    "type": "cross_ref",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "from_gear": "Chase Bliss Audio Clean",
+      "relation": "used_with",
+      "to_gear": [
+        { "gear": "Chase Bliss Audio / ZVEX Bliss Factory", "category": "Fuzz", "weight": 2 },
+        { "gear": "CIOKS DC7 Power Supply", "category": "Power", "weight": 2 },
+        { "gear": "D'Addario XPND Pedalboard - Large", "category": "Pedalboard", "weight": 1 },
+        { "gear": "Shure Beta 52A", "category": "Mic", "weight": 1 },
+        { "gear": "EarthQuaker Devices The Warden", "category": "Compressor", "weight": 1 },
+        { "gear": "Chase Bliss Audio Onward", "category": "Looper", "weight": 1 },
+        { "gear": "Boss FS-7 Dual Foot Switch", "category": "Switch", "weight": 1 },
+        { "gear": "Chase Bliss Audio MOOD MKII", "category": "Looper", "weight": 1 },
+        { "gear": "EarthQuaker Devices Plumes", "category": "Overdrive", "weight": 1 },
+        { "gear": "Boss RC-5 Loop Station", "category": "Looper", "weight": 1 }
+      ]
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#used-with",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-similar-gear",
+    "type": "cross_ref",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "from_gear": "Chase Bliss Audio Clean",
+      "relation": "similar_in_category",
+      "category": "Compressor Effects Pedals",
+      "to_gear_top10": [
+        { "rank": 1, "gear": "Origin Effects Cali76 Compact Deluxe", "rating": 5.0 },
+        { "rank": 2, "gear": "Boss CS-2 Compression Sustainer", "rating": 4.5 },
+        { "rank": 3, "gear": "Wampler Ego Compressor", "rating": 4.5 },
+        { "rank": 4, "gear": "Xotic Effects SP Compressor", "rating": 4.5 },
+        { "rank": 5, "gear": "Keeley Compressor Plus", "rating": 4.5 },
+        { "rank": 8, "gear": "MXR M102 Dyna Comp", "rating": 4.5 },
+        { "rank": 11, "gear": "Empress Compressor", "rating": 5.0 },
+        { "rank": 18, "gear": "JHS Pulp 'N Peel", "rating": 4.5 }
+      ]
+    },
+    "cross_source_match_candidates": ["Origin Effects Cali76 Compact Deluxe", "Empress Compressor", "JHS Pulp 'N Peel"],
+    "cross_source_match_note": "These three are also discussed by Rhett Shull (artist_usage) and by u/Twinningses in the Reddit review. Strong cross-source corroboration — high confidence Cali76 and Empress are the standard reference compressors to compare Clean against.",
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#more-in-category",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-gear-guides",
+    "type": "external_resource",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": [
+      { "resource_type": "gear_guide", "title": "Best Compressor Pedals for Guitar", "site": "Equipboard", "updated": "2025-08", "relevance": "high" },
+      { "resource_type": "gear_guide", "title": "Best Bass Compressor Pedals: Guide to the Top 5 Bass Compressors 2026", "site": "Equipboard", "updated": "2024-10", "relevance": "medium" }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#gear-guides",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  }
+];
+const RD = [
+  {
+    "id": "rd-cb-clean-meta",
+    "type": "post_metadata",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "title": "Chase Bliss Clean: A COMPrehensive Review.",
+      "author": "u/Twinningses",
+      "subreddit": "r/guitarpedals",
+      "upvotes": 464,
+      "comment_count": 64,
+      "self_text_chars": 17669,
+      "format": "long-form review with embedded preview.redd.it images and bold section headers"
+    },
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "fetch_method": "reddit .json suffix",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-intro",
+    "type": "review_section",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "section_header": "INTRO",
+      "key_thesis": "Clean is a phenomenal compressor — but this is NOT just a compressor. It is a multi-effects platform that uses compression as a *trigger* to vary other effects' intensity. Compression is a means to an end rather than the end itself. The author has not seen anything else on the market like this.",
+      "disclosures": "Author received review unit from Joel (Chase Bliss founder) at the author's request. No payment, no review obligation. Author flags this upfront for transparency.",
+      "author_credibility_signal": "Author is u/Twinningses, who previously posted a 'compressor shootout' comparing Wampler / Empress / Boss / Keeley — established compressor enthusiast on the sub."
+    },
+    "citation_targets": [
+      { "type": "reddit-post", "url": "https://www.reddit.com/r/guitarpedals/comments/1dcurfb/compressor_shootout_wampler_empress_boss_keeley/", "by_same_author": true, "label": "Author's previous compressor shootout" }
+    ],
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "**INTRO**",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-what-is-it",
+    "type": "review_section",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "section_header": "WHAT IS THIS THING?!",
+      "summary": "After 3 weeks (~40 hours) the author concluded Clean is best framed as 'a pedal that uses compression to TRIGGER other effects'. Examples given: flip 'Physics' switch + dig into guitar = glitchy wobble; subdue playing = back to normal. EQ switch + similar dynamic = different tonal shift. Compression amount becomes a control surface for OTHER effect parameters.",
+      "framing_takeaway": "If you're shopping for a compressor, this is the wrong category to put it in. Clean is a sound-design / mix tool that happens to also be a great compressor."
+    },
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "**WHAT IS THIS THING?!**",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-comp-noise",
+    "type": "review_subsection",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "parameter": "Noise floor",
+      "verdict": "Ultra low — even with wet/dry output knobs cranked. Quieter than the Empress (which the author says was 'already basically silent')."
+    },
+    "cross_source_targets": [{ "type": "comparison", "to_gear": "Empress Compressor" }],
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "**COMPRESSOR NOTES** > Noise",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-comp-input-gain",
+    "type": "review_subsection",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "parameter": "Input gain ceiling",
+      "verdict": "Cannot be overloaded — no clipping with any input (single coil, humbucker, bass) on any settings. This is critical because high-end compressors can be made to sound bad easily. Author explicitly contrasts with: 'The Cali76 and Empress are both really easy to make sound terrible by setting the attack/release too quick and compression high.' Clean is unusually tolerant of bad settings."
+    },
+    "cross_source_targets": [
+      { "type": "comparison", "to_gear": "Origin Effects Cali76 Compact Deluxe" },
+      { "type": "comparison", "to_gear": "Empress Compressor" }
+    ],
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "**COMPRESSOR NOTES** > Input Gain Ceiling",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-comp-amount",
+    "type": "review_subsection",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "parameter": "Compression amount / range",
+      "verdict": "Far more compression on hand than any other compressor the author has played. A common complaint about compressors is that they don't compress enough — the author wants compression as an audible *effect* (heavy ratio) and Clean has more headroom there than any competitor in their experience."
+    },
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "**COMPRESSOR NOTES** > Compression Amount",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-top-comments",
+    "type": "comment_aggregate",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": [
+      { "author": "u/majwilsonlion", "ups": 78, "snippet": "Bookmarked this post. Also bought the mystery box. Want it to contain a Clean more than anything." },
+      { "author": "u/Superduperdrag", "ups": 50, "snippet": "Deeply appreciate the formatting, organization, and visuals of this post." },
+      { "author": "u/Twinningses", "ups": 34, "snippet": "Author explains why they chose write-up over demo video — wanted detail / nuance the YouTube format wouldn't give." }
+    ],
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "comments (top 3 by score)",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  }
+];
+
+function escapeHtml(s) { return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderField(label, value) {
+  if (value === undefined || value === null) return '';
+  if (Array.isArray(value)) {
+    return `<div class="field"><div class="label">${label}</div><ul class="compact">${value.map(v => `<li>${typeof v === 'string' ? escapeHtml(v) : escapeHtml(JSON.stringify(v))}</li>`).join('')}</ul></div>`;
+  }
+  if (typeof value === 'object') {
+    return `<div class="field"><div class="label">${label}</div><pre>${escapeHtml(JSON.stringify(value, null, 2))}</pre></div>`;
+  }
+  return `<div class="field"><div class="label">${label}</div><div class="value">${escapeHtml(String(value))}</div></div>`;
+}
+
+function renderArtistUsage(c) {
+  const x = c.content;
+  return `
+    <div class="field"><div class="label">Artist</div><div class="value"><strong>${escapeHtml(x.artist)}</strong>${x.associated_act ? ` · ${escapeHtml(x.associated_act)}` : ''}</div></div>
+    <div class="field"><div class="label">Roles</div><div class="value">${escapeHtml((x.artist_roles || []).join(' · '))}</div></div>
+    <div class="field"><div class="label">Verification</div><div class="value">${escapeHtml(x.verification_type)} — ${escapeHtml(x.verification_note || '')}</div></div>
+    ${x.verbatim_quote ? `<div class="quote">${escapeHtml(x.verbatim_quote.slice(0, 700))}${x.verbatim_quote.length > 700 ? '…' : ''}</div>` : ''}
+    ${x.summary ? `<div class="field"><div class="label">Summary</div><div class="value">${escapeHtml(x.summary)}</div></div>` : ''}
+    ${x.alternatives_he_recommends ? `<div class="field"><div class="label">Alternatives recommended</div><ul class="compact">${x.alternatives_he_recommends.map(a => `<li>${escapeHtml(a)}</li>`).join('')}</ul></div>` : ''}
+  `;
+}
+
+function renderCrossRef(c) {
+  const x = c.content;
+  if (x.relation === 'used_with') {
+    return `
+      <div class="field"><div class="label">Relation</div><div class="value">${escapeHtml(x.from_gear)} <em>used with</em> →</div></div>
+      <ul class="compact">${x.to_gear.map(g => `<li>${escapeHtml(g.gear)} <span style="color: var(--muted); font-size: 11px;">(${escapeHtml(g.category)}, weight ${g.weight})</span></li>`).join('')}</ul>
+    `;
+  }
+  if (x.relation === 'similar_in_category') {
+    let html = `<div class="field"><div class="label">Relation</div><div class="value">Top compressor pedals in same category</div></div>
+      <ul class="compact">${x.to_gear_top10.map(g => `<li>#${g.rank} ${escapeHtml(g.gear)} <span style="color: var(--muted);">★${g.rating}</span></li>`).join('')}</ul>`;
+    if (c.cross_source_match_candidates) {
+      html += `<div class="cross-source"><div class="label">⤴ Cross-source match</div>${escapeHtml(c.cross_source_match_note)}<br><br>Matched gear: <strong>${c.cross_source_match_candidates.map(escapeHtml).join(', ')}</strong></div>`;
+    }
+    return html;
+  }
+  return renderField('content', x);
+}
+
+function renderReview(c) {
+  const x = c.content;
+  let html = '';
+  if (x.section_header) html += renderField('Section', x.section_header);
+  if (x.parameter) html += renderField('Parameter', x.parameter);
+  if (x.key_thesis) html += `<div class="field"><div class="label">Key thesis</div><div class="value">${escapeHtml(x.key_thesis)}</div></div>`;
+  if (x.summary) html += `<div class="field"><div class="label">Summary</div><div class="value">${escapeHtml(x.summary)}</div></div>`;
+  if (x.verdict) html += `<div class="field"><div class="label">Verdict</div><div class="value">${escapeHtml(x.verdict)}</div></div>`;
+  if (x.framing_takeaway) html += `<div class="field"><div class="label">Takeaway</div><div class="value">${escapeHtml(x.framing_takeaway)}</div></div>`;
+  if (x.disclosures) html += `<div class="field"><div class="label">Disclosures</div><div class="value">${escapeHtml(x.disclosures)}</div></div>`;
+  if (c.cross_source_targets) {
+    const targets = c.cross_source_targets.map(t => t.to_gear).filter(Boolean);
+    if (targets.length) html += `<div class="cross-source"><div class="label">⤴ Cross-source mention</div>References: <strong>${targets.map(escapeHtml).join(', ')}</strong> — also referenced on Equipboard's similar-gear list.</div>`;
+  }
+  return html;
+}
+
+function renderChunk(c) {
+  let body = '';
+  switch (c.type) {
+    case 'description': body = `<div class="chunk-body">${escapeHtml(c.content)}</div>`; break;
+    case 'product_specs': body = `<pre>${escapeHtml(JSON.stringify(c.content, null, 2))}</pre>`; break;
+    case 'faq':
+      body = c.content.map(f => `<div class="field"><div class="label">${escapeHtml(f.q)}</div><div class="value">${escapeHtml(f.a)}</div></div>`).join('');
+      break;
+    case 'artist_usage': body = renderArtistUsage(c); break;
+    case 'cross_ref': body = renderCrossRef(c); break;
+    case 'genre_usage':
+      body = `<ul class="compact">${c.content.map(g => `<li>${escapeHtml(g.genre)} — weight ${g.weight}</li>`).join('')}</ul>`;
+      break;
+    case 'external_resource':
+      body = `<ul class="compact">${c.content.map(r => `<li><strong>${escapeHtml(r.title)}</strong> — ${escapeHtml(r.resource_type)} on ${escapeHtml(r.site)} (${escapeHtml(r.updated || '')}, relevance: ${escapeHtml(r.relevance || '')})</li>`).join('')}</ul>`;
+      break;
+    case 'review_section':
+    case 'review_subsection': body = renderReview(c); break;
+    case 'post_metadata': body = `<pre>${escapeHtml(JSON.stringify(c.content, null, 2))}</pre>`; break;
+    case 'comment_aggregate':
+      body = c.content.map(cm => `<div class="field"><div class="label">${escapeHtml(cm.author)} · ${cm.ups} ups</div><div class="value">${escapeHtml(cm.snippet)}</div></div>`).join('');
+      break;
+    default: body = `<pre>${escapeHtml(JSON.stringify(c.content, null, 2))}</pre>`;
+  }
+  const tier = c.tier_used !== undefined ? `<span class="badge tier-${c.tier_used === 0 ? '0' : '1'}">tier ${c.tier_used}</span>` : '';
+  const isCrossSource = !!(c.cross_source_match_candidates || c.cross_source_targets);
+  const provLink = c.provenance.url ? `<a href="${c.provenance.url}" target="_blank">${c.provenance.section || c.provenance.url}</a>` : '';
+  return `<div class="chunk" data-type="${c.type}" data-cross-source="${isCrossSource}">
+    <div class="chunk-meta">
+      ${tier}
+      <span class="chunk-type">${escapeHtml(c.type)}</span>
+      ${isCrossSource ? '<span class="badge cross">cross-source</span>' : ''}
+      <span class="chunk-id">${escapeHtml(c.id)}</span>
+    </div>
+    ${body}
+    <div class="provenance">${provLink} · scraped ${escapeHtml(c.provenance.scraped_at)} · ${escapeHtml(c.provenance.tier_label || c.provenance.fetch_method || '')}</div>
+  </div>`;
+}
+
+document.getElementById('eb-chunks').innerHTML = EB.map(renderChunk).join('');
+document.getElementById('reddit-chunks').innerHTML = RD.map(renderChunk).join('');
+document.getElementById('eb-count').textContent = EB.length;
+document.getElementById('rd-count').textContent = RD.length;
+const crossCount = [...EB, ...RD].filter(c => c.cross_source_match_candidates || c.cross_source_targets).length;
+document.getElementById('cross-count').textContent = crossCount;
+
+// filter
+document.querySelectorAll('.filter-bar button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.filter;
+    document.querySelectorAll('.chunk').forEach(c => {
+      if (f === 'all') { c.style.display = ''; return; }
+      if (f === 'cross-source-only') { c.style.display = c.dataset.crossSource === 'true' ? '' : 'none'; return; }
+      const types = f.split(',');
+      c.style.display = types.includes(c.dataset.type) ? '' : 'none';
+    });
+  };
+});
+</script>
+</body>
+</html>

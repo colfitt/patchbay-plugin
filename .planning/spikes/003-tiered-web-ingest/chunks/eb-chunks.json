@@ -1,0 +1,225 @@
+[
+  {
+    "id": "eb-cb-clean-c01",
+    "type": "description",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": "The Chase Bliss Audio Clean is a compressor pedal with all-analog signal path complemented by digital controls. Hybrid design provides flexibility and precision without compromising sound integrity. Targets both subtle compression and pronounced effects. Suited for studio and live performance environments.\n\nKey Features: All-analog signal path with digital controls; versatile compression for various styles; intuitive UI; high-quality components; pedalboard-friendly.",
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#description",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED (tier 1 fetch returned 403 Cloudflare)"
+    }
+  },
+  {
+    "id": "eb-cb-clean-c02",
+    "type": "product_specs",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "brand": "Chase Bliss Audio",
+      "model": "Clean",
+      "finish": "White",
+      "year": "2024 - 2025",
+      "made_in": "United States",
+      "categories": ["Compressor Pedals"],
+      "pedal_format": "Standard",
+      "price_tier": "High-end",
+      "average_price_usd": 350,
+      "current_price_range_usd": [350, 350]
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#product-specs",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-c03",
+    "type": "faq",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": [
+      { "q": "Is the Chase Bliss Audio Clean compressor pedal suitable for both live performance and studio use?", "a": "Yes — designed for both, with stereo, analog, two-stage compression." },
+      { "q": "Does the Chase Bliss Audio Clean work well with both electric guitar and bass?", "a": "Yes — versatile for both, providing smooth compression and enhanced dynamic range." },
+      { "q": "What power supply does the Chase Bliss Audio Clean require?", "a": "Standard 9V DC, negative center pin." },
+      { "q": "Can the Chase Bliss Audio Clean be used in a stereo setup?", "a": "Yes — it's a stereo compressor." },
+      { "q": "How does the Chase Bliss Audio Clean differ from other compressor pedals?", "a": "Innovative two-stage compression and analog circuitry; unique blend of warmth and clarity." }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#faqs",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-artist-rhett",
+    "type": "artist_usage",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "artist": "Rhett Shull",
+      "artist_roles": ["Guitarist", "Music Producer"],
+      "verification_type": "youtube",
+      "verification_note": "Video review by Rhett Shull on his channel: 'How Did They Even Think Of This? Chase Bliss Clean'",
+      "verbatim_quote": "Okay, so to start off with, Clean is without a doubt an amazing sounding compressor. It's really versatile. It's actually quite easy to use. I think it's pretty beginner-friendly... if you're someone that likes to use pedals for sound design or to mix with, the Clean is an amazing option because it's true stereo in and out. You can actually use it like an outboard rack compressor like my Distressors up there, for example. You can put drums through this, put vocals through this, put your entire mix through this, and use it to do basic compression, gluing things together, to hard slammed limiting, to adding Distortion to EQ — like it's a really powerful tool for mixing and for sound design.",
+      "summary": "Rhett positions Clean as an amazing compressor for sound designers and mix-engineers, NOT for guitarists who only want subtle dynamics-evening compression — for that he says Clean is 'underutilized' and recommends UA 1176, JHS Pulp N Peel as cheaper alternatives. Highlights features: stereo in/out, MIDI in/out, expression+CV, side-chain input.",
+      "alternatives_he_recommends": ["UA 1176", "JHS Pulp N Peel"]
+    },
+    "citation_targets": [
+      { "type": "youtube", "creator": "Rhett Shull", "video_title": "How Did They Even Think Of This? Chase Bliss Clean" }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#artist-usage > Rhett Shull",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-artist-emily-green",
+    "type": "artist_usage",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "artist": "Emily Green",
+      "artist_roles": ["Guitarist"],
+      "associated_act": "Geese",
+      "verification_type": "photo",
+      "verification_note": "Visible on her pedalboard from the London show",
+      "summary": "Confirmed live use; pedalboard inclusion."
+    },
+    "citation_targets": [
+      { "type": "live-photo", "context": "Geese — London show pedalboard photo" }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#artist-usage > Emily Green",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-artist-emily-hopkins",
+    "type": "artist_usage",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "artist": "Emily Hopkins",
+      "artist_roles": ["Podcasters & Streamers", "Harpist"],
+      "associated_act": "Obverse.",
+      "verification_type": "youtube",
+      "verification_note": "Demo video by Emily Hopkins of the Chase Bliss Clean compressor",
+      "summary": "Harpist demos the pedal — notable because most compressor pedal demos are guitar-focused; harp use case validates Clean's versatility for non-traditional inputs."
+    },
+    "citation_targets": [
+      { "type": "youtube", "creator": "Emily Hopkins", "video_title": "Chase Bliss Clean demo (harp)" }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#artist-usage > Emily Hopkins",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-genres",
+    "type": "genre_usage",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": [
+      { "genre": "Rock", "weight": 14 },
+      { "genre": "Electronic", "weight": 9 },
+      { "genre": "Indie Rock", "weight": 7 },
+      { "genre": "Alternative Rock", "weight": 6 },
+      { "genre": "Funk / Soul", "weight": 5 },
+      { "genre": "Pop", "weight": 4 },
+      { "genre": "Jazz", "weight": 4 },
+      { "genre": "Hip Hop", "weight": 3 },
+      { "genre": "Ambient", "weight": 3 },
+      { "genre": "Experimental", "weight": 3 }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#genre-usage",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-used-with",
+    "type": "cross_ref",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "from_gear": "Chase Bliss Audio Clean",
+      "relation": "used_with",
+      "to_gear": [
+        { "gear": "Chase Bliss Audio / ZVEX Bliss Factory", "category": "Fuzz", "weight": 2 },
+        { "gear": "CIOKS DC7 Power Supply", "category": "Power", "weight": 2 },
+        { "gear": "D'Addario XPND Pedalboard - Large", "category": "Pedalboard", "weight": 1 },
+        { "gear": "Shure Beta 52A", "category": "Mic", "weight": 1 },
+        { "gear": "EarthQuaker Devices The Warden", "category": "Compressor", "weight": 1 },
+        { "gear": "Chase Bliss Audio Onward", "category": "Looper", "weight": 1 },
+        { "gear": "Boss FS-7 Dual Foot Switch", "category": "Switch", "weight": 1 },
+        { "gear": "Chase Bliss Audio MOOD MKII", "category": "Looper", "weight": 1 },
+        { "gear": "EarthQuaker Devices Plumes", "category": "Overdrive", "weight": 1 },
+        { "gear": "Boss RC-5 Loop Station", "category": "Looper", "weight": 1 }
+      ]
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#used-with",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-similar-gear",
+    "type": "cross_ref",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": {
+      "from_gear": "Chase Bliss Audio Clean",
+      "relation": "similar_in_category",
+      "category": "Compressor Effects Pedals",
+      "to_gear_top10": [
+        { "rank": 1, "gear": "Origin Effects Cali76 Compact Deluxe", "rating": 5.0 },
+        { "rank": 2, "gear": "Boss CS-2 Compression Sustainer", "rating": 4.5 },
+        { "rank": 3, "gear": "Wampler Ego Compressor", "rating": 4.5 },
+        { "rank": 4, "gear": "Xotic Effects SP Compressor", "rating": 4.5 },
+        { "rank": 5, "gear": "Keeley Compressor Plus", "rating": 4.5 },
+        { "rank": 8, "gear": "MXR M102 Dyna Comp", "rating": 4.5 },
+        { "rank": 11, "gear": "Empress Compressor", "rating": 5.0 },
+        { "rank": 18, "gear": "JHS Pulp 'N Peel", "rating": 4.5 }
+      ]
+    },
+    "cross_source_match_candidates": ["Origin Effects Cali76 Compact Deluxe", "Empress Compressor", "JHS Pulp 'N Peel"],
+    "cross_source_match_note": "These three are also discussed by Rhett Shull (artist_usage) and by u/Twinningses in the Reddit review. Strong cross-source corroboration — high confidence Cali76 and Empress are the standard reference compressors to compare Clean against.",
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#more-in-category",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  },
+  {
+    "id": "eb-cb-clean-gear-guides",
+    "type": "external_resource",
+    "source": "equipboard",
+    "tier_used": 0,
+    "content": [
+      { "resource_type": "gear_guide", "title": "Best Compressor Pedals for Guitar", "site": "Equipboard", "updated": "2025-08", "relevance": "high" },
+      { "resource_type": "gear_guide", "title": "Best Bass Compressor Pedals: Guide to the Top 5 Bass Compressors 2026", "site": "Equipboard", "updated": "2024-10", "relevance": "medium" }
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#gear-guides",
+      "scraped_at": "2026-05-08",
+      "tier_label": "USER_PASTED"
+    }
+  }
+]

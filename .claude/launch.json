@@ -12,6 +12,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8766", "--directory", ".planning/spikes"],
       "port": 8766
+    },
+    {
+      "name": "spike-003-viewer",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8767", "--directory", ".planning/spikes/003-tiered-web-ingest"],
+      "port": 8767
     }
   ]
 }

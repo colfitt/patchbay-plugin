@@ -1,0 +1,131 @@
+[
+  {
+    "id": "rd-cb-clean-meta",
+    "type": "post_metadata",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "title": "Chase Bliss Clean: A COMPrehensive Review.",
+      "author": "u/Twinningses",
+      "subreddit": "r/guitarpedals",
+      "upvotes": 464,
+      "comment_count": 64,
+      "self_text_chars": 17669,
+      "format": "long-form review with embedded preview.redd.it images and bold section headers"
+    },
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "fetch_method": "reddit .json suffix",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-intro",
+    "type": "review_section",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "section_header": "INTRO",
+      "key_thesis": "Clean is a phenomenal compressor — but this is NOT just a compressor. It is a multi-effects platform that uses compression as a *trigger* to vary other effects' intensity. Compression is a means to an end rather than the end itself. The author has not seen anything else on the market like this.",
+      "disclosures": "Author received review unit from Joel (Chase Bliss founder) at the author's request. No payment, no review obligation. Author flags this upfront for transparency.",
+      "author_credibility_signal": "Author is u/Twinningses, who previously posted a 'compressor shootout' comparing Wampler / Empress / Boss / Keeley — established compressor enthusiast on the sub."
+    },
+    "citation_targets": [
+      { "type": "reddit-post", "url": "https://www.reddit.com/r/guitarpedals/comments/1dcurfb/compressor_shootout_wampler_empress_boss_keeley/", "by_same_author": true, "label": "Author's previous compressor shootout" }
+    ],
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "**INTRO**",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-what-is-it",
+    "type": "review_section",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "section_header": "WHAT IS THIS THING?!",
+      "summary": "After 3 weeks (~40 hours) the author concluded Clean is best framed as 'a pedal that uses compression to TRIGGER other effects'. Examples given: flip 'Physics' switch + dig into guitar = glitchy wobble; subdue playing = back to normal. EQ switch + similar dynamic = different tonal shift. Compression amount becomes a control surface for OTHER effect parameters.",
+      "framing_takeaway": "If you're shopping for a compressor, this is the wrong category to put it in. Clean is a sound-design / mix tool that happens to also be a great compressor."
+    },
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "**WHAT IS THIS THING?!**",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-comp-noise",
+    "type": "review_subsection",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "parameter": "Noise floor",
+      "verdict": "Ultra low — even with wet/dry output knobs cranked. Quieter than the Empress (which the author says was 'already basically silent')."
+    },
+    "cross_source_targets": [{ "type": "comparison", "to_gear": "Empress Compressor" }],
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "**COMPRESSOR NOTES** > Noise",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-comp-input-gain",
+    "type": "review_subsection",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "parameter": "Input gain ceiling",
+      "verdict": "Cannot be overloaded — no clipping with any input (single coil, humbucker, bass) on any settings. This is critical because high-end compressors can be made to sound bad easily. Author explicitly contrasts with: 'The Cali76 and Empress are both really easy to make sound terrible by setting the attack/release too quick and compression high.' Clean is unusually tolerant of bad settings."
+    },
+    "cross_source_targets": [
+      { "type": "comparison", "to_gear": "Origin Effects Cali76 Compact Deluxe" },
+      { "type": "comparison", "to_gear": "Empress Compressor" }
+    ],
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "**COMPRESSOR NOTES** > Input Gain Ceiling",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-comp-amount",
+    "type": "review_subsection",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": {
+      "parameter": "Compression amount / range",
+      "verdict": "Far more compression on hand than any other compressor the author has played. A common complaint about compressors is that they don't compress enough — the author wants compression as an audible *effect* (heavy ratio) and Clean has more headroom there than any competitor in their experience."
+    },
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "**COMPRESSOR NOTES** > Compression Amount",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  },
+  {
+    "id": "rd-cb-clean-top-comments",
+    "type": "comment_aggregate",
+    "source": "reddit",
+    "tier_used": 1,
+    "content": [
+      { "author": "u/majwilsonlion", "ups": 78, "snippet": "Bookmarked this post. Also bought the mystery box. Want it to contain a Clean more than anything." },
+      { "author": "u/Superduperdrag", "ups": 50, "snippet": "Deeply appreciate the formatting, organization, and visuals of this post." },
+      { "author": "u/Twinningses", "ups": 34, "snippet": "Author explains why they chose write-up over demo video — wanted detail / nuance the YouTube format wouldn't give." }
+    ],
+    "provenance": {
+      "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/",
+      "section": "comments (top 3 by score)",
+      "scraped_at": "2026-05-08",
+      "tier_label": "TIER_1_STATIC"
+    }
+  }
+]
