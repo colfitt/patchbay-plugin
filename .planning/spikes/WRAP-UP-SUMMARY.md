@@ -56,11 +56,25 @@ User insight surfaced during spike 003: when an external resource (a specific Yo
 
 ## What's left to spike (deferred / nice-to-have)
 
-- **Tier-2 (Claude_in_Chrome) end-to-end on a real blocked URL** — proof-of-concept that the user-driven escalation actually delivers usable chunks. Documented as ready-to-execute in the web-scraping reference; just needs a session.
+- **Tier-2 (Claude_in_Chrome) end-to-end on a real blocked URL** — opened as spike 003b; runnable when user installs the Chrome extension. Not blocking.
 - **Whisper-vs-captions quality comparison** for YouTube — only matters if 002c's quality is insufficient at scale, which it wasn't for the spike's test video.
 - **Citation-count aggregation** — already specified as a seed; build alongside `patchbay:research`.
 
 These are nice-to-haves. The core architecture is sufficiently validated to start planning `patchbay:ingest` and `patchbay:research` as real phases.
+
+## Appendix — spike 003c added 2026-05-08 (after initial wrap-up)
+
+User asked whether tier-2 (Claude_in_Chrome) AND tier-3 (computer-use) could both be supported for flexibility. Spike 003c proved tier-3 works end-to-end against the same Cloudflare-blocked Equipboard URL that spike 003 logged in `failures.log`.
+
+**Verdict: VALIDATED.** Tier-3 escalation:
+- Bypasses Cloudflare entirely (page renders fully in user's real Chrome)
+- Requires only per-session `request_access` for Chrome (no extension install)
+- Captures content lower tiers miss — knob labels printed on the pedal product photo (DYNAMICS, SENSITIVITY (RAMP), WET, ATTACK, EQ, DRY, RELEASE, MODE, PHYSICS, AUX, BYPASS) — purely visual content not in the DOM text
+- Constraint: read-tier Chrome can't scroll programmatically; user scrolls between screenshots for below-fold content. The constraint is the architecture working as designed.
+
+**Architectural addition:** `failures.log` `suggested_escalation` field expands to `2 | 3 | "either" | "manual-paste" | "skip"`. Tier 2 and tier 3 are both first-class — they have different failure modes (tier 2: extension automation can be detected; tier 3: bulletproof but slower). Production should support both and let the user choose.
+
+Spike 003b (`Claude_in_Chrome` end-to-end) remains OPEN — runnable when the user has the extension installed. The web-scraping reference in the skill now documents both tiers fully.
 
 ## Routing for future conversations
 

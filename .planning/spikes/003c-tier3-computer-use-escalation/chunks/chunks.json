@@ -1,0 +1,115 @@
+[
+  {
+    "id": "eb-cb-clean-t3-c01",
+    "type": "tier3_capture_summary",
+    "source": "equipboard",
+    "tier_used": 3,
+    "content": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "tier_path": "tier 1 (curl static fetch) → 403 Cloudflare → logged to failures.log → user escalated → tier 3 (computer-use + Chrome read-tier + Claude vision)",
+      "outcome": "Page rendered successfully in real Chrome; viewport captured via screenshot; vision read all visible content. No 'Just a moment...' challenge — Cloudflare did not block the user's actual browser session.",
+      "viewport_only_caveat": "Read-tier Chrome via computer-use cannot scroll. Initial screenshot captured the above-the-fold viewport only (page header + breadcrumbs + pedal photo + price + CTA buttons + first-fold metadata). Below-fold content (description, FAQs, artist usage, owner insights, used-with, gear guides) requires the user to scroll the page; subsequent screenshots can capture each section."
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "viewport-1 (above the fold)",
+      "scraped_at": "2026-05-08T20:40:00Z",
+      "tier_label": "TIER_3_COMPUTER_USE",
+      "tool_used": "mcp__computer-use__screenshot at Chrome read-tier"
+    }
+  },
+  {
+    "id": "eb-cb-clean-t3-c02",
+    "type": "image",
+    "source": "equipboard",
+    "tier_used": 3,
+    "image_category": "panel-diagram",
+    "content": {
+      "description": "Hero photo of the Chase Bliss Audio Clean pedal, rendered on the Equipboard product page. Top-down view showing the pedal's full control layout. THREE ROWS OF KNOBS visible:\n\n  Row 1 (top — 3 knobs): DYNAMICS (green, far-left), SENSITIVITY (RAMP) (green, center), WET (blue, far-right)\n  Row 2 (3 knobs): ATTACK (green), EQ (green), DRY (blue)\n  Row 3 (3 small knobs): RELEASE, MODE, PHYSICS\n\nAt bottom: 'clean' wordmark in multi-color block letters (lime/teal/red/yellow/orange — characteristic Chase Bliss design language). Below the wordmark: AUX (small knob), BYPASS (footswitch icon).\n\nThis is the pedal's actual front-panel control surface — content the user-pasted text version (tier 0) didn't include because the pasted version was DOM-text-only. Tier 3 visual capture surfaces the pedal's control labels directly from the product photo."
+    },
+    "what_lower_tiers_missed": "Tier 0 (user-paste of text) and tier 1 (static fetch — blocked) both miss this. The pedal photo IS on the page, but neither tier extracts the labels embedded IN the photo image. Tier 3's vision pipeline reads the photo natively. This is exactly the same value-add as spike 002c's frame analysis vs spike 002a's transcript-only.",
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#hero-product-photo",
+      "scraped_at": "2026-05-08T20:40:00Z",
+      "tier_label": "TIER_3_COMPUTER_USE",
+      "rough_region": "left half of viewport-1"
+    }
+  },
+  {
+    "id": "eb-cb-clean-t3-c03",
+    "type": "structured_block",
+    "source": "equipboard",
+    "tier_used": 3,
+    "content": {
+      "block_label": "Right-rail product summary",
+      "fields": {
+        "title": "Chase Bliss Audio Clean",
+        "price_display": "$350.00",
+        "price_tier": "High-end",
+        "critic_review_count": 3,
+        "purchase_links_visible": ["Reverb", "ebay", "Guitar Center"],
+        "see_more_link": true,
+        "social_proof_strip": {
+          "artists_using": 3,
+          "community_setups": 4,
+          "wishlisted": 5,
+          "saved": 19,
+          "page_last_updated": "May 08, 2026"
+        }
+      }
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#right-rail",
+      "scraped_at": "2026-05-08T20:40:00Z",
+      "tier_label": "TIER_3_COMPUTER_USE",
+      "rough_region": "right column of viewport-1"
+    }
+  },
+  {
+    "id": "eb-cb-clean-t3-c04",
+    "type": "structured_block",
+    "source": "equipboard",
+    "tier_used": 3,
+    "content": {
+      "block_label": "Left thumbnail strip — gallery + media counts",
+      "items": [
+        { "label": "main pedal photo", "active": true },
+        { "label": "alternate photo 1" },
+        { "label": "alternate photo 2" },
+        { "label": "alternate photo 3" },
+        { "label": "View More" },
+        { "label": "4 Setups", "interpretation": "4 community setups using this pedal" },
+        { "label": "8 videos", "interpretation": "8 YouTube/video resources surfaced for this pedal" }
+      ]
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#gallery-thumbnails",
+      "scraped_at": "2026-05-08T20:40:00Z",
+      "tier_label": "TIER_3_COMPUTER_USE",
+      "rough_region": "far-left column of viewport-1"
+    }
+  },
+  {
+    "id": "eb-cb-clean-t3-c05",
+    "type": "structured_block",
+    "source": "equipboard",
+    "tier_used": 3,
+    "content": {
+      "block_label": "Breadcrumb path (validates gear taxonomy)",
+      "trail": ["Home", "...", "Guitar Pedals & Effects", "Compressor Effects Pedals", "Chase Bliss Audio", "Chase Bliss Audio Clean"]
+    },
+    "cross_source_match_candidates": [
+      "Compressor Effects Pedals (matches the category in the EB tier-0 chunks from spike 003)"
+    ],
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#breadcrumbs",
+      "scraped_at": "2026-05-08T20:40:00Z",
+      "tier_label": "TIER_3_COMPUTER_USE",
+      "rough_region": "top of content area"
+    }
+  }
+]

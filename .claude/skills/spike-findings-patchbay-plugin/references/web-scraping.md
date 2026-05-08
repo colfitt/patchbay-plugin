@@ -10,6 +10,8 @@ The primary external source class for `patchbay:research`. Validated in spike 00
 - **Reddit `.json` suffix is the cheap path** — no auth needed, returns full post + comments tree. Production should default to this for any reddit.com URL before attempting other tiers.
 - **Knowledge-graph chunk types** (`artist_usage`, `cross_ref`) are higher-leverage than flat content chunks. Don't skip them.
 - **Cross-source corroboration is automatic** — when multiple sources reference the same gear/artist, set `cross_source_match_candidates` on the chunk. This emerges from chunk creation, not a separate ranking pass.
+- **Tier 2 AND tier 3 are both first-class escalation paths.** Tier 2 (Claude_in_Chrome extension) is faster + DOM-aware but requires user to install the extension. Tier 3 (computer-use + vision) is slower + viewport-only but needs only per-session permission and is bulletproof against anti-bot. Validated end-to-end in spike 003c.
+- **Production tier-2 escalation must precheck extension connection** — `mcp__Claude_in_Chrome__list_connected_browsers` returning `[]` is a setup prerequisite, not a runtime failure. Surface install instructions, don't fail silently.
 
 ## How to Build It
 
@@ -102,13 +104,37 @@ User reviews this file and decides. Production exposes a CLI or skill (`patchbay
 
 ### Tier-2 escalation (Claude_in_Chrome)
 
-When the user opts to escalate, the production flow drives the user's actual Chrome via the `Claude_in_Chrome` MCP server. This is **indistinguishable from a human** because it IS a human user's browser. No anti-bot system can reliably block it.
+When the user opts to escalate to tier 2, the production flow drives the user's actual Chrome via the `Claude_in_Chrome` MCP server. This is **indistinguishable from a human** because it IS a human user's browser.
 
 Pattern:
-1. `tabs_context_mcp` — get current tab info
-2. `navigate` to the blocked URL
-3. `read_page` or `get_page_text` — extract the DOM content
-4. Pipe to the same chunker that processes manual user-paste
+1. **Precheck:** `mcp__Claude_in_Chrome__list_connected_browsers` — if `[]`, the extension isn't connected. Surface install instructions to the user, do NOT proceed silently. (Failure mode validated in spike 003c.)
+2. `tabs_context_mcp` — get current tab info / create new tab
+3. `navigate` to the blocked URL
+4. `read_page` or `get_page_text` — extract the DOM content
+5. Pipe to the same chunker that processes manual user-paste
+
+### Tier-3 escalation (computer-use + Claude vision) — VALIDATED in spike 003c
+
+When tier 2 isn't set up (no extension) OR a site breaks tier 2's DOM extraction (heavy shadow DOM, frame-busting, extension-specific blocks), tier 3 is the bulletproof fallback. Bypasses Cloudflare, anti-bot, and any DOM-level defenses because it's just looking at pixels.
+
+Pattern:
+1. `mcp__computer-use__request_access(["Google Chrome"], reason="...")` — per-session permission grant. Browsers are granted at tier `read` (no clicks/typing).
+2. `open -na "Google Chrome" --args --new-window URL` — system-level navigation handoff (NOT a click into Chrome — this is the same mechanism users invoke when clicking a link from Mail). Allowed at read tier.
+3. `sleep 5` (or longer for slow-loading pages)
+4. `mcp__computer-use__screenshot` — captures the current viewport
+5. Read the screenshot via Claude vision; produce chunks
+6. **For below-fold content:** ask the user to scroll the page. Take more screenshots. Append chunks. Read-tier Chrome can't scroll programmatically — that's by design.
+7. Optional: `mcp__computer-use__zoom` to inspect small UI details before chunking.
+
+**Trade-offs:**
+- ✓ Works on any site, regardless of anti-bot
+- ✓ No setup beyond per-session permission grant
+- ✓ Captures content embedded in images (knob labels on product photos, screen states in screenshots) — content tier-2 DOM extraction can't see
+- ✗ Slower (vision-token cost per screenshot)
+- ✗ Viewport-only — multi-screenshot scrolling needed for long pages
+- ✗ Requires user to be at desktop with Chrome installed
+
+**Bonus value-add:** spike 003c found that tier-3 captures the actual control labels printed on product photos (e.g., "DYNAMICS, SENSITIVITY (RAMP), WET, ATTACK, EQ, DRY, RELEASE, MODE, PHYSICS, AUX, BYPASS" on the Chase Bliss Clean) — content that tier-0 user-paste of DOM text DOES NOT include. Same architectural pattern as spike 002c (frames vs transcript): images carry information that text doesn't.
 
 ### Knowledge-graph chunk types (the high-leverage ones)
 

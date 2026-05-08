@@ -82,6 +82,12 @@ Original spike READMEs and core source files preserved in `sources/` for complet
 - 002a-yt-captions-only (PARTIAL)
 - 002c-yt-multimodal-sampled (VALIDATED secondary)
 - 003-tiered-web-ingest (VALIDATED)
+- 003c-tier3-computer-use-escalation (VALIDATED) — appended after first wrap-up
 
 Wrap-up date: 2026-05-08
+Last appended: 2026-05-08 (spike 003c)
+
+## Open Spikes
+
+- 003b-tier2-claude-in-chrome-escalation — runnable when user installs the Chrome extension; not blocking
 </metadata>
