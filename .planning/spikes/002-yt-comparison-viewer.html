@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spike 002 — YT captions-only vs multimodal-sampled</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --panel: #18181b;
+    --border: #2a2a30;
+    --text: #e4e4e7;
+    --muted: #a1a1aa;
+    --accent: #f97316;
+    --accent-dim: #92400e;
+    --captions: #1e3a5f;
+    --captions-text: #93c5fd;
+    --multimodal: #4a2419;
+    --multimodal-text: #fdba74;
+    --insight: #14532d;
+    --insight-text: #86efac;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font: 14px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  }
+  header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  h1 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+  .sub { color: var(--muted); font-size: 12px; }
+  .meta-bar {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .meta-bar a { color: var(--accent); text-decoration: none; }
+  .meta-bar a:hover { text-decoration: underline; }
+  nav.timeline {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    position: sticky; top: 0; z-index: 10;
+  }
+  nav button {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    cursor: pointer;
+  }
+  nav button:hover { border-color: var(--accent-dim); }
+  nav button.active {
+    background: var(--accent); border-color: var(--accent);
+    color: #0f0f10; font-weight: 600;
+  }
+  nav .label { color: var(--muted); font-size: 11px; align-self: center; margin-right: 8px; }
+  main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    gap: 20px;
+    padding: 24px;
+    max-width: 1700px;
+    margin: 0 auto;
+  }
+  .pane { min-width: 0; }
+  .pane h2 {
+    margin: 0 0 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 10px;
+  }
+  .badge.captions { background: var(--captions); color: var(--captions-text); }
+  .badge.multimodal { background: var(--multimodal); color: var(--multimodal-text); }
+  .chunk {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .chunk-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .chunk-id { opacity: 0.7; }
+  .deep-link {
+    color: var(--accent); text-decoration: none; font-weight: 600;
+  }
+  .deep-link:hover { text-decoration: underline; }
+  .caption-text {
+    font-size: 13px; line-height: 1.6;
+    color: var(--text);
+  }
+  .frame-img {
+    width: 100%; height: auto;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: block;
+    margin: 12px 0;
+  }
+  .section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 14px 0 6px;
+    font-weight: 600;
+  }
+  .frame-desc, .audio-misses {
+    font-size: 12px; line-height: 1.6;
+  }
+  .audio-misses-block {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--insight);
+    border-radius: 6px;
+    border-left: 3px solid var(--insight-text);
+  }
+  .audio-misses-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--insight-text);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .audio-misses {
+    color: #d1fae5;
+  }
+  .empty-state {
+    color: var(--muted); font-style: italic; padding: 20px; text-align: center;
+    border: 1px dashed var(--border); border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Spike 002 — YT captions-only vs multimodal-sampled</h1>
+  <div class="sub">Same source video. Left column: what auto-captions alone produce (002a). Right column: captions + sampled frames + frame analysis (002c).</div>
+</header>
+<div class="meta-bar">
+  <span><strong>Video:</strong> Getting Started with MPC Sample | Navigation and Sounds</span>
+  <span><strong>Channel:</strong> Akai Professional</span>
+  <span><strong>Length:</strong> 13:29</span>
+  <a href="https://www.youtube.com/watch?v=Q3DzJ2t6p68" target="_blank">↗ Open on YouTube</a>
+</div>
+<nav class="timeline" id="nav">
+  <span class="label">Jump to:</span>
+</nav>
+<main>
+  <div class="pane">
+    <h2><span class="badge captions">002a</span>captions only</h2>
+    <div id="captions-pane"></div>
+  </div>
+  <div class="pane">
+    <h2><span class="badge multimodal">002c</span>multimodal (captions + frame + analysis)</h2>
+    <div id="multimodal-pane"></div>
+  </div>
+</main>
+<script>
+const CAPTIONS = [
+  {
+    "id": "yt-cap-000",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 2.23,
+    "end_time": 32.55,
+    "duration": 30.32,
+    "text": "Hi there [music] and welcome to the MPC Sample Academy. In this series of videos, I will walk you through [music] the entire process using MPC Sample. In this first episode, we will cover navigating around the hardware and walk you through all the key features. There's also a quick start guide in the box to get you up and running instantly so you can start making your own beats. As soon as you switch on MPC sample, [music] the factory startup kits and demo projects will automatically load with eight demo projects and eight different styles of drum kits [music] across pad banks A to H. Now press the",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=2s",
+      "timestamp_display": "0:02\u20130:32"
+    }
+  },
+  {
+    "id": "yt-cap-001",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 32.56,
+    "end_time": 62.63,
+    "duration": 30.07,
+    "text": "green play button [music] and MPC sample will start playing some of the factory beats. Now to stop the beat, just [music] press the white stop button. Now, if you hit the pads, you can play all the samples and start creating your own beats. Now, to listen to some of the other drum kits, hold down the pad [music] bank button, then you can select any one of the eight preloaded kits. Let's go to",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=32s",
+      "timestamp_display": "0:32\u20131:02"
+    }
+  },
+  {
+    "id": "yt-cap-002",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 62.64,
+    "end_time": 94.23,
+    "duration": 31.59,
+    "text": "the 808 kit. [music] Now, let's hold down pad bank and let's select a different drum kit. [music] Here's an electronic kit. Now, to record your own beats, press the sequence button. This [music] takes us into our sequencer screen. Using the pads, you can now select sequences. Now, any of the pads that are bright yellow already have sequences made. [music] Now, you can select an empty sequence by pressing the dimmed lit pads, which are blank sequences. Now, once you've selected the",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=62s",
+      "timestamp_display": "1:02\u20131:34"
+    }
+  },
+  {
+    "id": "yt-cap-003",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 94.24,
+    "end_time": 126.07,
+    "duration": 31.83,
+    "text": "sequence, it will pulse in green. Now, let's change our tempo by holding our tempo button and [music] using the encoder. Now we're ready to record. Hit the sequence record button and play. [music] Now we're putting down our kick and snare idea. Now if you make a mistake, you can press and hold shift and the [music] undo button to start again. If you decide to keep the part again, press redo. [music] Now with sequence record still armed, we",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=94s",
+      "timestamp_display": "1:34\u20132:06"
+    }
+  },
+  {
+    "id": "yt-cap-004",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 126.08,
+    "end_time": 158.39,
+    "duration": 32.31,
+    "text": "can add more ideas over our beat. Let's add a high hat. &gt;&gt; [music] &gt;&gt; Now let's add a shaker. Now we've recorded our idea. Let's turn off sequence record and [music] hit sample button to go back to our sounds. Now let's hold note repeat. That will repeat our sound in sync.",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=126s",
+      "timestamp_display": "2:06\u20132:38"
+    }
+  },
+  {
+    "id": "yt-cap-005",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 160.55,
+    "end_time": 192.39,
+    "duration": 31.84,
+    "text": "Now, to speed it up, use the time divisions at the top of the screen. Note repeat is a great feature, especially for recording [music] your high hats. Holding down the erase button, then the pad will [music] remove those event notes from your sequence. We're removing our high hats. [music] Now, let's hold down shift and undo and we'll put our high hats back in. [music] Now, to record a sound of your own voice using a built-in mic, press the record",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=160s",
+      "timestamp_display": "2:40\u20133:12"
+    }
+  },
+  {
+    "id": "yt-cap-006",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 192.4,
+    "end_time": 223.03,
+    "duration": 30.63,
+    "text": "sample button. Now, press the pad you wish to record your sound to and speak into the mic. Check one. Check two. Now, press the pad again to end the recording. Now, press sample to see our recording. And now, we can trim the start and end points to the parts we want to use just by turning the knobs. Check one. Check two. Now, if you hold shift and pad 13, we can trim the sample, removing the parts we don't need. If you press the tune button, we can now change the pitch of our sample.",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=192s",
+      "timestamp_display": "3:12\u20133:43"
+    }
+  },
+  {
+    "id": "yt-cap-007",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 223.04,
+    "end_time": 253.11,
+    "duration": 30.07,
+    "text": "&gt;&gt; Check one. Check one. Check two. &gt;&gt; If we turn warp on, our sample will now be in time. &gt;&gt; Check one, check two. Check one, check two. [music] Check one, check two. &gt;&gt; Check one, check two. &gt;&gt; If we press knob effects, we can add effects like reverb. One, check two. Check one, check two. &gt;&gt; To load your own samples, the sample select button allows you to access the internal factory library or an SD card",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=223s",
+      "timestamp_display": "3:43\u20134:13"
+    }
+  },
+  {
+    "id": "yt-cap-008",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 253.12,
+    "end_time": 283.51,
+    "duration": 30.39,
+    "text": "for your own sounds. Find a sound and then push down onto the encoder and it will load straight to the selected pad. If you change the directory from internal to external, you can now access samples from your own SD card. Now, to name and save your samples, hold down shift and sample select. The MPC fader allows you to change the volume of a sample by holding down the pad [music] and moving the fader up and down. If you hold shift and press pad 9, you can",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=253s",
+      "timestamp_display": "4:13\u20134:43"
+    }
+  },
+  {
+    "id": "yt-cap-009",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 283.52,
+    "end_time": 314.07,
+    "duration": 30.55,
+    "text": "change the fader's controls, which will be displayed [music] on the screen, including everything from panning, tuning to filter cutff. At the top under modes, we have our sample button, which when we hit a pad will display the sample on the color screen. Here we can go under trim and we can trim the start and end points of our sample. Holding shift allows us to zoom in for more accuracy. Then we can change to mix for our levels and panning. And then we have our envelope. Then we have",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=283s",
+      "timestamp_display": "4:43\u20135:14"
+    }
+  },
+  {
+    "id": "yt-cap-010",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 314.08,
+    "end_time": 344.15,
+    "duration": 30.07,
+    "text": "tuning where we can tune our samples. [music] Then we have mute groups, mono and offset. Then if you hold down shift here, you can link pads together. And then next to this, you have your filters with all of your classic MPC filter types. [music] Next to this, we have our sequence button where we can set up MPC sample for [music] recording. We can set our bar length. We can set our quantiz division or even add realtime swing.",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=314s",
+      "timestamp_display": "5:14\u20135:44"
+    }
+  },
+  {
+    "id": "yt-cap-011",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 344.16,
+    "end_time": 374.63,
+    "duration": 30.47,
+    "text": "Above this we have our tempo. Then we have our master tempo across all sequences. And in here we can turn our quantise on and off. If you hold shift, you can change the [music] time signature and adjust the metronome level. At the heart of MPC sample are the four powerful creative [music] effects engines with 60 effects types which can be applied over your beats in real time using the three knobs. Now the first is pad effects. This gives us [music] up to four effects that we can",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=344s",
+      "timestamp_display": "5:44\u20136:14"
+    }
+  },
+  {
+    "id": "yt-cap-012",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 374.64,
+    "end_time": 405.91,
+    "duration": 31.27,
+    "text": "apply by putting pressure on the pads. [music] If you press the latch button, it will lock the effect [music] over your beat to the pad. You can also edit the effects using the knobs. [music] Next, we have flex speed. If you hold down shift and press the pad effects button, the pads go purple. Now we have",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=374s",
+      "timestamp_display": "6:14\u20136:45"
+    }
+  },
+  {
+    "id": "yt-cap-013",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 405.92,
+    "end_time": 437.75,
+    "duration": 31.83,
+    "text": "a patternbased effects engine. This has everything from stutters, tape stops. [music] You can adjust the mix amount of the effect. And to change the effect type, just strike the pad. Then you have knob effects. This is where you can apply a plugin across your whole track. And you have 28 different effects types to choose from. And you can apply this effect to all pads or to individual pads. We have everything here",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=405s",
+      "timestamp_display": "6:45\u20137:17"
+    }
+  },
+  {
+    "id": "yt-cap-014",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 437.76,
+    "end_time": 461.77,
+    "duration": 24.01,
+    "text": "from filters, [music] bus compressors, and limiters through to reverbs [music] to vintage MPC emulations to vinyl and tape. Yeah. [music]",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=437s",
+      "timestamp_display": "7:17\u20137:41"
+    }
+  },
+  {
+    "id": "yt-cap-015",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 475.67,
+    "end_time": 509.27,
+    "duration": 33.6,
+    "text": "Our final effect is our brand new color compressor. This adds color, vintage fill, and depth and punch over your beats. The more amount we add, the more punch [music] and bite we have to our drums. We can also resample back to a pad with effects on. As an example, I'm going to take this beat that has vintage effects",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=475s",
+      "timestamp_display": "7:55\u20138:29"
+    }
+  },
+  {
+    "id": "yt-cap-016",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 511.03,
+    "end_time": 543.27,
+    "duration": 32.24,
+    "text": "and we're going to resample this back to a pad. So, we hold down shift, press pad 11, which is reample, and press the pad. It's now reampling with the effects on. [music] This means that you can now change your effects and use them on something else. MPC samples chop mode automatically chops samples across the pads with one touch, offering five different chop types, including transients, four regions, eight regions, 16 regions, and",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=511s",
+      "timestamp_display": "8:31\u20139:03"
+    }
+  },
+  {
+    "id": "yt-cap-017",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 543.28,
+    "end_time": 574.55,
+    "duration": 31.27,
+    "text": "manual chopping. [music] We can go into each chop and manually change the start and end position of our chop. [music] If you hold down shift, we can zoom straight in to the start and end position. So you can get the perfect chop every time. Now to go back to the original sample, just press the chop button again. Now to loop samples, just turn on the loop button. And now press",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=543s",
+      "timestamp_display": "9:03\u20139:34"
+    }
+  },
+  {
+    "id": "yt-cap-018",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 574.56,
+    "end_time": 589.03,
+    "duration": 14.47,
+    "text": "the sample. [music] Now the sample will loop automatically. Holding shift, you can reverse the loop. It's also great using chop [music] for melodic samples",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=574s",
+      "timestamp_display": "9:34\u20139:49"
+    }
+  },
+  {
+    "id": "yt-cap-019",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 604.95,
+    "end_time": 642.23,
+    "duration": 37.28,
+    "text": "You also have 16 levels button that allows you to use the 16 pads to spread the pitch of a sample [music] chromatically. If you hold down shift, you can change the different 16 [music] level types from velocity to opening up your filter. We also have a mute button that allows [music] you to mute the pads within your sequence so you can create inspiring arrangements. [music]",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=604s",
+      "timestamp_display": "10:04\u201310:42"
+    }
+  },
+  {
+    "id": "yt-cap-020",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 644.87,
+    "end_time": 675.59,
+    "duration": 30.72,
+    "text": "Then you have note on which changes how a sample is triggered on the pad. If you hold the pad down, it will [music] continually play the sample until you take your finger off the pad. The pads also have secondary functions by holding down shift. Here you [music] have everything from full levels through to quantize on and off to entering song mode where we can [music] chain our sequences together by entering different parts to create your own song arrangement. MPC sample has powerful sampling [music] capabilities allowing",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=644s",
+      "timestamp_display": "10:44\u201311:15"
+    }
+  },
+  {
+    "id": "yt-cap-021",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 675.6,
+    "end_time": 710.39,
+    "duration": 34.79,
+    "text": "you to reample internally with and without effects, sample inputs [music] through to sample recall, so you never ever miss an idea that you're playing on the pads. &gt;&gt; [music] &gt;&gt; Now, I want to sample this beat and we're going to add some effects to this beat. So, we're going to turn them on. [music] And now, we're going to reample this back to a pad. You hold down shift, hit reample, and select the pad. And now it's rendered the sample with effects.",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=675s",
+      "timestamp_display": "11:15\u201311:50"
+    }
+  },
+  {
+    "id": "yt-cap-022",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 713.11,
+    "end_time": 743.11,
+    "duration": 30.0,
+    "text": "To sample, simply hit sample record. And now select your input source from the microphone rear inputs to USB and resampling. We also have sample recall which is continually recording in the background. So if I play a melody, [music] I can recall this as a sample. Hit shift sample [music] recall and it now puts it to a pad. There's what I played. [music] You can now edit this. chop the sample",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=713s",
+      "timestamp_display": "11:53\u201312:23"
+    }
+  },
+  {
+    "id": "yt-cap-023",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 743.12,
+    "end_time": 774.31,
+    "duration": 31.19,
+    "text": "up, add effects, and [music] add it over your beat. You also have a micro SD card slot, which allows you [music] to load and save samples and projects. You can also mount the card to your PC and Mac to move [music] projects and samples. To increase or lower the volume, you have a dedicated volume knob. Below this, you can see the rechargeable [music] battery indicator. When fully charged, the indicator will be green. When amber, you have 30% [music] remaining. And when flashing red, you need to recharge MPC sample using the",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=743s",
+      "timestamp_display": "12:23\u201312:54"
+    }
+  },
+  {
+    "id": "yt-cap-024",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 774.32,
+    "end_time": 804.39,
+    "duration": 30.07,
+    "text": "supplied USBC [music] cable. You also have a built-in speaker, which is perfect for onthe-go beat making. And on the rear, you can access all of your inputs and outputs to MPC sample. Make sure you update your MPC sample to the latest firmware by following the address below. You can either use a smart device or [music] your desktop computer by plugging in the USB cable provided. This will automatically update your MPC sample. Now, thanks for watching. To learn more,",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=774s",
+      "timestamp_display": "12:54\u201313:24"
+    }
+  },
+  {
+    "id": "yt-cap-025",
+    "type": "transcript",
+    "source": "auto-captions",
+    "start_time": 804.4,
+    "end_time": 809.0,
+    "duration": 4.6,
+    "text": "head over to the MPC sample [music] academy.",
+    "provenance": {
+      "video_id": "Q3DzJ2t6p68",
+      "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68",
+      "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=804s",
+      "timestamp_display": "13:24\u201313:29"
+    }
+  }
+];
+const MULTIMODAL = [
+  {
+    "id": "yt-mm-000",
+    "timestamp": 0,
+    "frame": "frame_001.jpg",
+    "frame_description": "Wide top-down product shot. MPC Sample on a wood desk; vinyl record at left edge, potted plant top-left. The host's hands hold what appears to be the printed Quickstart Guide directly in front of the unit, with motion blur on the booklet (it's mid-flip). AKAI Professional watermark bottom-right. Lifestyle/branding establishing shot, no operational detail.",
+    "caption_window": "0:00–0:30",
+    "caption_text": "Hi there [music] and welcome to the MPC Sample Academy. In this series of videos, I will walk you through [music] the entire process using MPC Sample. In this first episode, we will cover navigating around the hardware and walk you through all the key features.",
+    "what_audio_misses": "Audio confirms: this is the academy intro, episode 1 = navigation/features. Visual adds: the host is showing a printed Quickstart Guide as a prop — the audio doesn't reference it, but it's the document the user gets in the box.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=0s" }
+  },
+  {
+    "id": "yt-mm-001",
+    "timestamp": 30,
+    "frame": "frame_002.jpg",
+    "frame_description": "Clean top-down product shot, no host. Full top panel visible: AKAI logo top-left, MPC SAMPLE wordmark top-right, display showing Trim view with sample 'BoomBap-Kik-BTB MD' (yellow waveform). Pad bank 'A' indicator (green LED). All controls labeled and readable: SAMPLE/SEQ mode buttons, PAD FX/KNOB FX, K1-K3 knobs, the 4×4 pad grid with secondary labels (1 FULL LEVEL through 16 PROJECT), SHIFT, PAD BANK, ERASE/NOTE REPEAT, fader, encoder, +/- UNDO/REDO, SAMPLE RECORD/SEQ RECORD, STOP/PLAY transport.",
+    "caption_window": "0:30–1:02",
+    "caption_text": "[music] First, let's get familiar with all the features that MPC Sample has to offer. I will start by hitting the green play button [music] and MPC sample will start playing some of the factory beats. Now to stop the beat, just [music] press the white stop button. Now, if you hit the pads, you can play all the samples that are currently loaded on",
+    "what_audio_misses": "Audio names buttons. Visual confirms WHICH button is which: green play = far-right transport with triangle icon (callout 39 from manual page 16); white stop = transport square icon (callout 40). Without the visual, 'green play button' is ambiguous — the unit has multiple colored buttons. Frame also makes the entire control taxonomy visible at once.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=30s" }
+  },
+  {
+    "id": "yt-mm-002",
+    "timestamp": 60,
+    "frame": "frame_003.jpg",
+    "frame_description": "Host's left hand on the fader, right hand reaching toward bottom-row pads (1 FULL LEVEL / 2 HALF SEQ area). Display shows pad bank 'E' selected and sample '01 OpHouse-Kik-Anel B4'. Two green LEDs visible on the PAD PLAY column (one each for CHOP/MUTE rows). A red lower-third title banner is sliding into frame from the bottom (transition).",
+    "caption_window": "1:02–1:34",
+    "caption_text": "the 808 kit. [music] Now, let's hold down pad bank and let's select a different drum kit. [music] Here's an electronic kit. Now, to record your own beats, press the sequence button. This [music] takes you to the sequence mode. Now, to record, press and hold the SR sequence record button. The screen will then say start recording. The metronome will then start playing. Hit the play button.",
+    "what_audio_misses": "Visual shows the actual hand motion of holding PAD BANK and the resulting bank-letter change ('E' indicator). Audio doesn't show that the pad bank indicator letter is what changed.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=60s" }
+  },
+  {
+    "id": "yt-mm-003",
+    "timestamp": 90,
+    "frame": "frame_004.jpg",
+    "frame_description": "Display shows a large '2' (count-in countdown) with red record dot. SEQ RECORD button illuminated red. Pad bank 'A' indicator. Bottom-third overlay: large red banner with text '**START RECORDING**'. The frame visually confirms the screen state during count-in.",
+    "caption_window": "1:34–2:04",
+    "caption_text": "And the metronome will count you in for you to start recording. Now, every time the loop loops over, the next pad layer will be added. So you can either record drums or melody. So you can quickly hear the result.",
+    "what_audio_misses": "Visual confirms: count-in shows as a large numeral on the display; the on-screen overlay 'START RECORDING' is a video editorial title — useful context that the audio narration doesn't include. Confirms record-light state during count-in.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=90s" }
+  },
+  {
+    "id": "yt-mm-004",
+    "timestamp": 120,
+    "frame": "frame_005.jpg",
+    "frame_description": "SEQ MODE active on display: 'Seq A13', '92.0' tempo, '4/4' time signature, red 'Rec' indicator, bar position '001.03', status line '2 Bars Q 1/16 RT Swing'. SEQ RECORD button glowing red. Host's right hand pointing/about to press a pad in the third row (around pad 6 HALF SPEED). Pad bank 'A'.",
+    "caption_window": "2:04–2:35",
+    "caption_text": "[music] Now I have a 2 bar loop, but if you want a longer loop, you can press shift and the second pad. This will turn the sequence into 4 bars. [music] If you want a shorter loop, just hit shift and the first pad. Now you can quickly switch between the two by hitting the same buttons.",
+    "what_audio_misses": "The display shows actual sequence parameters at this moment: '2 Bars' and 'Q 1/16' (quantize). When the host says 'SHIFT + second pad' to make 4 bars, the visual shows the labels printed below the pads — pad 2 secondary function is 'HALF SEQ', pad 1 is 'FULL LEVEL', and elsewhere are 'DOUBLE SEQ' markings. The pad-label printing is critical context the audio leaves implicit.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=120s" }
+  },
+  {
+    "id": "yt-mm-005",
+    "timestamp": 180,
+    "frame": "frame_007.jpg",
+    "frame_description": "Display shows SAMPLE RECORD mode: 'Tap pad to record' instruction text at top with a touch/finger icon, 'Auto' mode label upper-left, microphone icon, parameter labels at bottom: 'Rip', 'Free', 'Thresh' (rip threshold setting). SAMPLE RECORD button illuminated red. Two green LEDs visible on PAD PLAY column.",
+    "caption_window": "3:00–3:32",
+    "caption_text": "Now, the next mode that I want to talk about is sample record mode. So press the SR sample record button. Now this will take you to a screen where you can record your own samples. Now you have multiple options. You can either use the built-in microphone, or you can use a 1/4 inch jack to record your own samples.",
+    "what_audio_misses": "Visual reveals the actual SR mode interface: 'Auto' threshold mode is selected, parameter knobs assigned to Rip/Free/Thresh. The user knows there's a threshold mode because they SEE 'Thresh' on screen — audio just says 'multiple options'. Mic icon also visible on display.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=180s" }
+  },
+  {
+    "id": "yt-mm-006",
+    "timestamp": 300,
+    "frame": "frame_011.jpg",
+    "frame_description": "Close-up angle. 'Tune' tab active in the top tab row (alongside Trim/Filter). Sample 'A02 HipHop-Snr-Rya1 SY' loaded with single-line waveform. Bottom labels for K1-K3: 'Semi Tune', 'Fine Tune', 'Warp'. Host's hand is on K1, indicating he's adjusting Semi Tune. PAD PLAY button column shows CHOP, MUTE, LOOP, 16 LEVELS lit blue.",
+    "caption_window": "4:48–5:20",
+    "caption_text": "Now, with the Tune tab, you can change the pitch of the sample. So you can either tune up or tune down. Now, the Filter tab allows you to apply a filter on top of the sample. Now you can use the K2 knob to adjust the cutoff and the K3 knob to adjust the resonance.",
+    "what_audio_misses": "Visual shows that Tune tab also reveals SHIFT-modified controls 'Semi Tune / Fine Tune / Warp' which the audio narration condenses to just 'pitch'. The user can SEE the three different tuning granularities (semitone, cents, warp/timestretch) — audio loses that.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=300s" }
+  },
+  {
+    "id": "yt-mm-007",
+    "timestamp": 420,
+    "frame": "frame_015.jpg",
+    "frame_description": "KNOB FX menu on display: 'Reverb Lrg' top-left, 'All Pads' middle-top, 'Bypass' on right. Effect list visible: HP Filter, LP Filter, BP Filter, **Bus Compressor** (highlighted/selected), Limiter, Pumper. Bottom K1/K2/K3 labels: 'Pre-delay', 'Time', 'Mix'. KNOB FX button illuminated bright orange. Pads outlined in blue showing FX assignment. Host's hand reaching toward right side of unit.",
+    "caption_window": "6:45–7:17",
+    "caption_text": "a patternbased effects engine. This has everything from stutters, tape stops. [music] You can adjust the mix amount of the effect. And to change the effect type, just strike the pad. Then you have knob effects. This is where you can apply a plugin across your whole track. And you have 28 different effects types to choose from. And you can apply this effect to all pads or to individual pads. We have everything here",
+    "what_audio_misses": "MAJOR visual signal: the actual list of available KNOB FX is on screen — HP Filter, LP Filter, BP Filter, Bus Compressor, Limiter, Pumper (and more below the fold). Audio says '28 different effects types' but doesn't name them. Bus Compressor is currently highlighted, with K1/K2/K3 mapped to 'Pre-delay / Time / Mix' — those are not Compressor parameters, suggesting either the highlight is for navigation only or these knobs are the active Reverb's controls. This is exactly the kind of nuance the audio doesn't capture.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=420s" }
+  },
+  {
+    "id": "yt-mm-008",
+    "timestamp": 570,
+    "frame": "frame_020.jpg",
+    "frame_description": "Pad bank 'B' selected (different from earlier 'A'). Display shows 'BBS Break-Kick HG' sample with two-line waveform (stereo). PAD FX AND KNOB FX buttons BOTH illuminated bright orange (both FX systems engaged simultaneously). Pads heavily outlined in blue (showing FX assignment). Two green LEDs in PAD PLAY column.",
+    "caption_window": "9:25–9:57",
+    "caption_text": "[music] You can also save samples on the SD card to use them later. And, of course, you can also load samples from the SD card. Now, that wraps up most of the navigation features.",
+    "what_audio_misses": "Visual shows: BOTH PAD FX and KNOB FX are simultaneously active (both buttons orange). Audio at this point talks about SD card save/load — totally different topic. The frame is showing a pad-bank/FX-stack state from before; this is a CONTRADICTION between caption window and frame timing that flags an alignment quirk: the frame shows the previous demo's setup while the audio has moved on.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=570s" }
+  },
+  {
+    "id": "yt-mm-009",
+    "timestamp": 750,
+    "frame": "frame_026.jpg",
+    "frame_description": "Close-up. Sample 'A11 Sample 010-Trimmed-T...' (truncated). Tune tab active with bottom labels 'Semi Tune / Fine Tune / Warp' visible. Both PAD FX and KNOB FX illuminated orange. Pink/red title banner sliding in from the bottom (transition to next section).",
+    "caption_window": "12:30–13:00",
+    "caption_text": "Now, that wraps up the navigation and sounds episode. In the next episode, we will dive deeper into the sample mode and how to record your own samples. So, stay tuned for more.",
+    "what_audio_misses": "Audio is the outro/teaser for episode 2. Visual confirms the sample being shown is 'Sample 010-Trimmed-T' (truncated display) — i.e., a user-trimmed sample, not a factory one — providing closure on the trim/edit segment.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=750s" }
+  }
+];
+
+const nav = document.getElementById('nav');
+const capPane = document.getElementById('captions-pane');
+const mmPane = document.getElementById('multimodal-pane');
+
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function captionsForRange(start, end) {
+  // Return all caption chunks whose start_time falls within the range
+  return CAPTIONS.filter(c => c.start_time >= start && c.start_time < end);
+}
+
+function renderTimestamp(ts) {
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', +b.dataset.ts === ts));
+
+  // Find the multimodal chunk at this timestamp
+  const mm = MULTIMODAL.find(m => m.timestamp === ts);
+  if (!mm) return;
+
+  // Find the caption chunk that covers this timestamp
+  const caps = captionsForRange(ts, ts + 30);
+  const cap = caps[0] || CAPTIONS.find(c => c.start_time <= ts && c.end_time >= ts);
+
+  // Render captions-only pane
+  if (cap) {
+    capPane.innerHTML = `<div class="chunk">
+      <div class="chunk-meta">
+        <span class="chunk-id">${escapeHtml(cap.id)}</span>
+        <a class="deep-link" href="${cap.provenance.deep_link}" target="_blank">${escapeHtml(cap.provenance.timestamp_display)} ↗</a>
+      </div>
+      <div class="caption-text">${escapeHtml(cap.text)}</div>
+    </div>`;
+  } else {
+    capPane.innerHTML = `<div class="empty-state">No caption chunk at this timestamp</div>`;
+  }
+
+  // Render multimodal pane
+  mmPane.innerHTML = `<div class="chunk">
+    <div class="chunk-meta">
+      <span class="chunk-id">${escapeHtml(mm.id)}</span>
+      <a class="deep-link" href="${mm.provenance.deep_link}" target="_blank">${escapeHtml(mm.caption_window)} ↗</a>
+    </div>
+    <div class="caption-text">${escapeHtml(mm.caption_text)}</div>
+    <img class="frame-img" src="002c-yt-multimodal-sampled/frames/${escapeHtml(mm.frame)}" alt="Frame at ${mm.timestamp}s">
+    <div class="section-label">Frame description</div>
+    <div class="frame-desc">${escapeHtml(mm.frame_description)}</div>
+    <div class="audio-misses-block">
+      <div class="audio-misses-label">What audio misses (or misleads on)</div>
+      <div class="audio-misses">${escapeHtml(mm.what_audio_misses)}</div>
+    </div>
+  </div>`;
+}
+
+MULTIMODAL.forEach(mm => {
+  const b = document.createElement('button');
+  b.textContent = fmtTime(mm.timestamp);
+  b.dataset.ts = mm.timestamp;
+  b.onclick = () => renderTimestamp(mm.timestamp);
+  nav.appendChild(b);
+});
+
+if (MULTIMODAL.length) renderTimestamp(MULTIMODAL[0].timestamp);
+</script>
+</body>
+</html>

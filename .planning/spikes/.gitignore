@@ -1,0 +1,6 @@
+# Don't commit raw video downloads — they're regeneratable from the yt-dlp commands
+# documented in spike READMEs. Frames + chunks ARE committed for the viewer.
+**/raw/*.mp4
+**/raw/*.m4a
+**/raw/*.webm
+**/raw/*.mkv

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "yt-mm-000",
+    "timestamp": 0,
+    "frame": "frame_001.jpg",
+    "frame_description": "Wide top-down product shot. MPC Sample on a wood desk; vinyl record at left edge, potted plant top-left. The host's hands hold what appears to be the printed Quickstart Guide directly in front of the unit, with motion blur on the booklet (it's mid-flip). AKAI Professional watermark bottom-right. Lifestyle/branding establishing shot, no operational detail.",
+    "caption_window": "0:00–0:30",
+    "caption_text": "Hi there [music] and welcome to the MPC Sample Academy. In this series of videos, I will walk you through [music] the entire process using MPC Sample. In this first episode, we will cover navigating around the hardware and walk you through all the key features.",
+    "what_audio_misses": "Audio confirms: this is the academy intro, episode 1 = navigation/features. Visual adds: the host is showing a printed Quickstart Guide as a prop — the audio doesn't reference it, but it's the document the user gets in the box.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=0s" }
+  },
+  {
+    "id": "yt-mm-001",
+    "timestamp": 30,
+    "frame": "frame_002.jpg",
+    "frame_description": "Clean top-down product shot, no host. Full top panel visible: AKAI logo top-left, MPC SAMPLE wordmark top-right, display showing Trim view with sample 'BoomBap-Kik-BTB MD' (yellow waveform). Pad bank 'A' indicator (green LED). All controls labeled and readable: SAMPLE/SEQ mode buttons, PAD FX/KNOB FX, K1-K3 knobs, the 4×4 pad grid with secondary labels (1 FULL LEVEL through 16 PROJECT), SHIFT, PAD BANK, ERASE/NOTE REPEAT, fader, encoder, +/- UNDO/REDO, SAMPLE RECORD/SEQ RECORD, STOP/PLAY transport.",
+    "caption_window": "0:30–1:02",
+    "caption_text": "[music] First, let's get familiar with all the features that MPC Sample has to offer. I will start by hitting the green play button [music] and MPC sample will start playing some of the factory beats. Now to stop the beat, just [music] press the white stop button. Now, if you hit the pads, you can play all the samples that are currently loaded on",
+    "what_audio_misses": "Audio names buttons. Visual confirms WHICH button is which: green play = far-right transport with triangle icon (callout 39 from manual page 16); white stop = transport square icon (callout 40). Without the visual, 'green play button' is ambiguous — the unit has multiple colored buttons. Frame also makes the entire control taxonomy visible at once.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=30s" }
+  },
+  {
+    "id": "yt-mm-002",
+    "timestamp": 60,
+    "frame": "frame_003.jpg",
+    "frame_description": "Host's left hand on the fader, right hand reaching toward bottom-row pads (1 FULL LEVEL / 2 HALF SEQ area). Display shows pad bank 'E' selected and sample '01 OpHouse-Kik-Anel B4'. Two green LEDs visible on the PAD PLAY column (one each for CHOP/MUTE rows). A red lower-third title banner is sliding into frame from the bottom (transition).",
+    "caption_window": "1:02–1:34",
+    "caption_text": "the 808 kit. [music] Now, let's hold down pad bank and let's select a different drum kit. [music] Here's an electronic kit. Now, to record your own beats, press the sequence button. This [music] takes you to the sequence mode. Now, to record, press and hold the SR sequence record button. The screen will then say start recording. The metronome will then start playing. Hit the play button.",
+    "what_audio_misses": "Visual shows the actual hand motion of holding PAD BANK and the resulting bank-letter change ('E' indicator). Audio doesn't show that the pad bank indicator letter is what changed.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=60s" }
+  },
+  {
+    "id": "yt-mm-003",
+    "timestamp": 90,
+    "frame": "frame_004.jpg",
+    "frame_description": "Display shows a large '2' (count-in countdown) with red record dot. SEQ RECORD button illuminated red. Pad bank 'A' indicator. Bottom-third overlay: large red banner with text '**START RECORDING**'. The frame visually confirms the screen state during count-in.",
+    "caption_window": "1:34–2:04",
+    "caption_text": "And the metronome will count you in for you to start recording. Now, every time the loop loops over, the next pad layer will be added. So you can either record drums or melody. So you can quickly hear the result.",
+    "what_audio_misses": "Visual confirms: count-in shows as a large numeral on the display; the on-screen overlay 'START RECORDING' is a video editorial title — useful context that the audio narration doesn't include. Confirms record-light state during count-in.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=90s" }
+  },
+  {
+    "id": "yt-mm-004",
+    "timestamp": 120,
+    "frame": "frame_005.jpg",
+    "frame_description": "SEQ MODE active on display: 'Seq A13', '92.0' tempo, '4/4' time signature, red 'Rec' indicator, bar position '001.03', status line '2 Bars Q 1/16 RT Swing'. SEQ RECORD button glowing red. Host's right hand pointing/about to press a pad in the third row (around pad 6 HALF SPEED). Pad bank 'A'.",
+    "caption_window": "2:04–2:35",
+    "caption_text": "[music] Now I have a 2 bar loop, but if you want a longer loop, you can press shift and the second pad. This will turn the sequence into 4 bars. [music] If you want a shorter loop, just hit shift and the first pad. Now you can quickly switch between the two by hitting the same buttons.",
+    "what_audio_misses": "The display shows actual sequence parameters at this moment: '2 Bars' and 'Q 1/16' (quantize). When the host says 'SHIFT + second pad' to make 4 bars, the visual shows the labels printed below the pads — pad 2 secondary function is 'HALF SEQ', pad 1 is 'FULL LEVEL', and elsewhere are 'DOUBLE SEQ' markings. The pad-label printing is critical context the audio leaves implicit.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=120s" }
+  },
+  {
+    "id": "yt-mm-005",
+    "timestamp": 180,
+    "frame": "frame_007.jpg",
+    "frame_description": "Display shows SAMPLE RECORD mode: 'Tap pad to record' instruction text at top with a touch/finger icon, 'Auto' mode label upper-left, microphone icon, parameter labels at bottom: 'Rip', 'Free', 'Thresh' (rip threshold setting). SAMPLE RECORD button illuminated red. Two green LEDs visible on PAD PLAY column.",
+    "caption_window": "3:00–3:32",
+    "caption_text": "Now, the next mode that I want to talk about is sample record mode. So press the SR sample record button. Now this will take you to a screen where you can record your own samples. Now you have multiple options. You can either use the built-in microphone, or you can use a 1/4 inch jack to record your own samples.",
+    "what_audio_misses": "Visual reveals the actual SR mode interface: 'Auto' threshold mode is selected, parameter knobs assigned to Rip/Free/Thresh. The user knows there's a threshold mode because they SEE 'Thresh' on screen — audio just says 'multiple options'. Mic icon also visible on display.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=180s" }
+  },
+  {
+    "id": "yt-mm-006",
+    "timestamp": 300,
+    "frame": "frame_011.jpg",
+    "frame_description": "Close-up angle. 'Tune' tab active in the top tab row (alongside Trim/Filter). Sample 'A02 HipHop-Snr-Rya1 SY' loaded with single-line waveform. Bottom labels for K1-K3: 'Semi Tune', 'Fine Tune', 'Warp'. Host's hand is on K1, indicating he's adjusting Semi Tune. PAD PLAY button column shows CHOP, MUTE, LOOP, 16 LEVELS lit blue.",
+    "caption_window": "4:48–5:20",
+    "caption_text": "Now, with the Tune tab, you can change the pitch of the sample. So you can either tune up or tune down. Now, the Filter tab allows you to apply a filter on top of the sample. Now you can use the K2 knob to adjust the cutoff and the K3 knob to adjust the resonance.",
+    "what_audio_misses": "Visual shows that Tune tab also reveals SHIFT-modified controls 'Semi Tune / Fine Tune / Warp' which the audio narration condenses to just 'pitch'. The user can SEE the three different tuning granularities (semitone, cents, warp/timestretch) — audio loses that.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=300s" }
+  },
+  {
+    "id": "yt-mm-007",
+    "timestamp": 420,
+    "frame": "frame_015.jpg",
+    "frame_description": "KNOB FX menu on display: 'Reverb Lrg' top-left, 'All Pads' middle-top, 'Bypass' on right. Effect list visible: HP Filter, LP Filter, BP Filter, **Bus Compressor** (highlighted/selected), Limiter, Pumper. Bottom K1/K2/K3 labels: 'Pre-delay', 'Time', 'Mix'. KNOB FX button illuminated bright orange. Pads outlined in blue showing FX assignment. Host's hand reaching toward right side of unit.",
+    "caption_window": "6:45–7:17",
+    "caption_text": "a patternbased effects engine. This has everything from stutters, tape stops. [music] You can adjust the mix amount of the effect. And to change the effect type, just strike the pad. Then you have knob effects. This is where you can apply a plugin across your whole track. And you have 28 different effects types to choose from. And you can apply this effect to all pads or to individual pads. We have everything here",
+    "what_audio_misses": "MAJOR visual signal: the actual list of available KNOB FX is on screen — HP Filter, LP Filter, BP Filter, Bus Compressor, Limiter, Pumper (and more below the fold). Audio says '28 different effects types' but doesn't name them. Bus Compressor is currently highlighted, with K1/K2/K3 mapped to 'Pre-delay / Time / Mix' — those are not Compressor parameters, suggesting either the highlight is for navigation only or these knobs are the active Reverb's controls. This is exactly the kind of nuance the audio doesn't capture.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=420s" }
+  },
+  {
+    "id": "yt-mm-008",
+    "timestamp": 570,
+    "frame": "frame_020.jpg",
+    "frame_description": "Pad bank 'B' selected (different from earlier 'A'). Display shows 'BBS Break-Kick HG' sample with two-line waveform (stereo). PAD FX AND KNOB FX buttons BOTH illuminated bright orange (both FX systems engaged simultaneously). Pads heavily outlined in blue (showing FX assignment). Two green LEDs in PAD PLAY column.",
+    "caption_window": "9:25–9:57",
+    "caption_text": "[music] You can also save samples on the SD card to use them later. And, of course, you can also load samples from the SD card. Now, that wraps up most of the navigation features.",
+    "what_audio_misses": "Visual shows: BOTH PAD FX and KNOB FX are simultaneously active (both buttons orange). Audio at this point talks about SD card save/load — totally different topic. The frame is showing a pad-bank/FX-stack state from before; this is a CONTRADICTION between caption window and frame timing that flags an alignment quirk: the frame shows the previous demo's setup while the audio has moved on.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=570s" }
+  },
+  {
+    "id": "yt-mm-009",
+    "timestamp": 750,
+    "frame": "frame_026.jpg",
+    "frame_description": "Close-up. Sample 'A11 Sample 010-Trimmed-T...' (truncated). Tune tab active with bottom labels 'Semi Tune / Fine Tune / Warp' visible. Both PAD FX and KNOB FX illuminated orange. Pink/red title banner sliding in from the bottom (transition to next section).",
+    "caption_window": "12:30–13:00",
+    "caption_text": "Now, that wraps up the navigation and sounds episode. In the next episode, we will dive deeper into the sample mode and how to record your own samples. So, stay tuned for more.",
+    "what_audio_misses": "Audio is the outro/teaser for episode 2. Visual confirms the sample being shown is 'Sample 010-Trimmed-T' (truncated display) — i.e., a user-trimmed sample, not a factory one — providing closure on the trim/edit segment.",
+    "provenance": { "video_id": "Q3DzJ2t6p68", "video_url": "https://www.youtube.com/watch?v=Q3DzJ2t6p68", "deep_link": "https://www.youtube.com/watch?v=Q3DzJ2t6p68&t=750s" }
+  }
+]

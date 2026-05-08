@@ -6,6 +6,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8765", "--directory", ".planning/spikes/001-vision-quality-pedal-manual"],
       "port": 8765
+    },
+    {
+      "name": "spike-002-viewer",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8766", "--directory", ".planning/spikes"],
+      "port": 8766
     }
   ]
 }
