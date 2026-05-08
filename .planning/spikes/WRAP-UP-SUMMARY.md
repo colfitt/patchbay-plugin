@@ -76,6 +76,35 @@ User asked whether tier-2 (Claude_in_Chrome) AND tier-3 (computer-use) could bot
 
 Spike 003b (`Claude_in_Chrome` end-to-end) remains OPEN — runnable when the user has the extension installed. The web-scraping reference in the skill now documents both tiers fully.
 
+## Appendix — spike 003b added 2026-05-08 (after 003c — completes the tier ladder)
+
+User installed the Claude in Chrome extension and re-ran spike 003b for real. **Verdict: VALIDATED.**
+
+Tier-2 returned the **entire DOM in a single `get_page_text` call** — structured plain text, ~10KB cleaned, covering every section of the Equipboard page in ~10 seconds end-to-end.
+
+**The real architectural finding from the side-by-side:**
+
+Tier 0 (user-paste) — which looked complete in spike 003 — turned out to be **substantially incomplete** when compared against tier 2's full DOM:
+- Tier 0 missed 6 of 8 videos (only Rhett Shull's was in the pasted excerpt)
+- Tier 0 missed ALL 3 critic reviews with their full text (compressorpedalreviews.com, guitarworld.com, gearnews.com)
+- Tier 0 missed the "Used With" category rollup
+- Tier 0 missed page metadata (added-by user, gear IQ, add date)
+
+This **demoted tier 0 to "last-resort escape hatch"** in the architecture. Production should always prefer tier 2 when the extension is connected; tier 0 is for sessions where neither tier 2 nor tier 3 is set up.
+
+**Tier 2 + Tier 3 are complementary, not redundant.** Tier 2 captures structured DOM but NOT image-embedded text (knob labels printed on product photos, screen states in tutorial screenshots). Tier 3 (003c) captures those via vision but is viewport-limited and slow. **Recommended production primary path: tier 2 first, optional tier 3 follow-up for image-rich pages.**
+
+**Citation-count seed gets real data:** the 8 videos with creator+title pairs from tier 2's DOM extraction are exactly what the seed at [`.planning/seeds/citation-count-recommendations.md`](../seeds/citation-count-recommendations.md) needs to test against. With 3 critic reviews on external domains and 8 videos with creators, the citation aggregator has a real corpus to develop on.
+
+**The fetch tier ladder is now end-to-end-validated:**
+
+| Tier | Status | When to use |
+|------|--------|-------------|
+| 1 — static fetch | ✓ 003 (failure mode confirmed on Cloudflare) | Always try first; cheap |
+| 2 — Claude_in_Chrome | ✓ **003b** | Primary escalation when extension installed; gold-standard DOM extraction |
+| 3 — computer-use + vision | ✓ 003c | Tier-2 unavailable, OR image-rich page where image text matters |
+| 0 — user-paste | ✓ 003 | Last-resort escape hatch when 2 and 3 are both unavailable |
+
 ## Routing for future conversations
 
 The skill at [`.claude/skills/spike-findings-patchbay-plugin/`](../../.claude/skills/spike-findings-patchbay-plugin/) auto-loads in implementation work via the routing line in [CLAUDE.md](../../CLAUDE.md). Future build sessions read the SKILL.md + relevant references and don't need to re-derive these decisions.

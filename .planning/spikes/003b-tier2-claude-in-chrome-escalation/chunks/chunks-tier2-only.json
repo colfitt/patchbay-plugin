@@ -1,0 +1,146 @@
+[
+  {
+    "id": "eb-cb-clean-t2-c01",
+    "type": "tier_capture_summary",
+    "source": "equipboard",
+    "tier_used": 2,
+    "content": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "fetch_method": "Claude_in_Chrome MCP — navigate + get_page_text",
+      "outcome": "Full DOM text returned in a single call (~10KB cleaned). Page rendered identically to tier 3, but with all sections accessible (no viewport limit). No Cloudflare challenge.",
+      "advantages_over_tier3": "Tier 2 captured the ENTIRE page in one call. Tier 3 (003c) was viewport-only because read-tier Chrome can't scroll. Tier 0 (003 user-paste) was also incomplete — the user pasted what they highlighted, missing 3 critic reviews and 6 of the 8 videos.",
+      "advantages_over_tier0": "Tier 0 user-paste produced what looked like a complete chunk set, but missed 3 entire critic reviews (compressorpedalreviews.com, guitarworld.com, gearnews.com — all with full text), missed 6 of 8 videos, and missed the Used With category breakdown. The user pastes selectively; tier 2 captures comprehensively.",
+      "missing_vs_tier3": "Tier 2 didn't capture image-embedded text (the knob labels printed on the pedal photo: DYNAMICS, SENSITIVITY, etc). Tier 3 vision DID. So both have unique value — tier 2 for structured DOM, tier 3 for visual content."
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "full-page",
+      "scraped_at": "2026-05-08T20:50:00Z",
+      "tier_label": "TIER_2_CLAUDE_IN_CHROME"
+    }
+  },
+  {
+    "id": "eb-cb-clean-t2-videos",
+    "type": "external_resource",
+    "source": "equipboard",
+    "tier_used": 2,
+    "content": [
+      { "resource_type": "youtube", "creator": "Rhett Shull", "title": "How Did They Even Think Of This? Chase Bliss Clean", "relevance": "high" },
+      { "resource_type": "youtube", "creator": "chase bliss", "title": "Introducing – Clean, the Creative Compressor", "relevance": "high", "note": "Official manufacturer launch video" },
+      { "resource_type": "youtube", "creator": "Harp Lady", "title": "Chase Bliss Clean", "relevance": "medium", "note": "Likely Emily Hopkins (harp player verified in artist_usage)" },
+      { "resource_type": "youtube", "creator": "SpiralCasterPlaysPedals", "title": "6 Ways The Chase Bliss CLEAN Is More Fun Than Your Grandpa's Compressor", "relevance": "medium" },
+      { "resource_type": "youtube", "creator": "Mike Hermans", "title": "CHASE BLISS Clean Creative Compressor", "relevance": "medium" },
+      { "resource_type": "youtube", "creator": "Sasha Ivantic", "title": "Chase Bliss Can Make A Boring Compressor Special: CLEAN! Compression Plus!", "relevance": "medium" },
+      { "resource_type": "youtube", "creator": "Doug Hanson", "title": "Chase Bliss Clean Stereo Analog Compressor | Demo", "relevance": "medium" },
+      { "resource_type": "youtube", "creator": "Jackson Brooksby", "title": "Using the BEST sounds in Chase Bliss Clean to write a song", "relevance": "medium", "note": "Use-case-driven demo" }
+    ],
+    "missed_by_lower_tiers": "Tier 0 user-paste only mentioned Rhett Shull's video. The other 7 videos (including the official Chase Bliss launch video and Emily Hopkins's harp demo) were in DOM but not in the pasted excerpt.",
+    "citation_count_seed_implication": "Of these 8 creators, Rhett Shull is also cited in the artist_usage block AND has a verbatim review captured. That's a citation count of 2 for Rhett's video — under threshold but the data is now structured for the citation-count → recommendation seed.",
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#videos",
+      "scraped_at": "2026-05-08T20:50:00Z",
+      "tier_label": "TIER_2_CLAUDE_IN_CHROME"
+    }
+  },
+  {
+    "id": "eb-cb-clean-t2-critic-review-1",
+    "type": "critic_review",
+    "source": "equipboard",
+    "tier_used": 2,
+    "content": {
+      "review_source_domain": "compressorpedalreviews.com",
+      "title": "Chase Bliss Clean Compressor Review",
+      "sentiment": "positive",
+      "summary": "The Chase Bliss Clean Compressor is a game-changer for those ready to explore beyond the ordinary. With a wealth of features, including modulation, envelope manipulation, and even a dirt mode, it transforms traditional compression into a creative playground. The pedal excels in tonal warmth and versatility, handling both guitar and bass effortlessly. However, its complexity may overwhelm players looking for simplicity, and its price tag could deter some. If you thrive on experimentation, the Clean is an inspiring investment, but those averse to fiddling might find it daunting. Overall, it's a uniquely impressive tool for the adventurous musician."
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#critic-reviews > compressorpedalreviews.com",
+      "scraped_at": "2026-05-08T20:50:00Z",
+      "tier_label": "TIER_2_CLAUDE_IN_CHROME"
+    }
+  },
+  {
+    "id": "eb-cb-clean-t2-critic-review-2",
+    "type": "critic_review",
+    "source": "equipboard",
+    "tier_used": 2,
+    "content": {
+      "review_source_domain": "guitarworld.com",
+      "title": "\"The idea behind this pedal is to make clean guitar as fun as overdriven guitar\": Chase Bliss is on a mission to make you rethink clean guitar tones with the \"very fun\" Clean compressor",
+      "sentiment": "positive",
+      "summary": "Chase Bliss Audio's Clean compressor pedals redefine the clean guitar experience, offering a plethora of controls that add depth and character to your tone. With features like a built-in noise gate and MIDI compatibility, it's designed to be both versatile and interactive. However, the $469 price tag might make some players hesitate—especially those who may not fully utilize its extensive capabilities. Overall, while it might be complex for beginners, seasoned musicians will appreciate its rich functionality and potential for unique soundscapes.",
+      "price_quoted_in_review": "$469",
+      "price_on_eb_page": "$350",
+      "price_discrepancy_note": "GuitarWorld review quotes $469; Equipboard page lists current price as $350. Potential ingestion gotcha — reviews may reference launch prices that differ from current."
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#critic-reviews > guitarworld.com",
+      "scraped_at": "2026-05-08T20:50:00Z",
+      "tier_label": "TIER_2_CLAUDE_IN_CHROME"
+    }
+  },
+  {
+    "id": "eb-cb-clean-t2-critic-review-3",
+    "type": "critic_review",
+    "source": "equipboard",
+    "tier_used": 2,
+    "content": {
+      "review_source_domain": "gearnews.com",
+      "title": "Chase Bliss Clean: Revolutionary Compression",
+      "sentiment": "positive",
+      "summary": "Chase Bliss Clean redefines compression with its dual-stage analog circuit and extensive digital controls, offering musicians a wealth of creative possibilities. The pedal excels in delivering studio-grade sound and features like tube-like sag and organic instability, making it a versatile tool for both ambient textures and punchy mixes. However, its complexity might overwhelm those already perplexed by compression, potentially limiting its appeal to novice players. Overall, it's a groundbreaking piece of gear that pushes the boundaries of clean compression, but be prepared for a learning curve."
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#critic-reviews > gearnews.com",
+      "scraped_at": "2026-05-08T20:50:00Z",
+      "tier_label": "TIER_2_CLAUDE_IN_CHROME"
+    }
+  },
+  {
+    "id": "eb-cb-clean-t2-used-with-categories",
+    "type": "cross_ref",
+    "source": "equipboard",
+    "tier_used": 2,
+    "content": {
+      "from_gear": "Chase Bliss Audio Clean",
+      "relation": "used_with_category_summary",
+      "category_weights": {
+        "Overdrive Effects Pedals": 5,
+        "Looper Effects Pedals": 3,
+        "Effects Pedal Accessories": 2,
+        "Pedalboards": 2,
+        "Switch Effects Pedals": 2
+      }
+    },
+    "missed_by_tier0": "Tier 0 user-paste only listed individual gear items in Used With; this category-level rollup was not in the pasted text. Useful signal: most common category to pair with Clean is Overdrive (5 pairings) — guitarist usage pattern.",
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#used-with > category rollup",
+      "scraped_at": "2026-05-08T20:50:00Z",
+      "tier_label": "TIER_2_CLAUDE_IN_CHROME"
+    }
+  },
+  {
+    "id": "eb-cb-clean-t2-page-meta",
+    "type": "page_metadata",
+    "source": "equipboard",
+    "tier_used": 2,
+    "content": {
+      "added_to_eb": "2024-10-22",
+      "added_by": "michael",
+      "added_by_gear_iq": 41819,
+      "page_last_updated": "2026-05-08",
+      "indexed_in_eb_search": true
+    },
+    "provenance": {
+      "url": "https://equipboard.com/items/chase-bliss-audio-clean",
+      "section": "#footer",
+      "scraped_at": "2026-05-08T20:50:00Z",
+      "tier_label": "TIER_2_CLAUDE_IN_CHROME"
+    }
+  }
+]

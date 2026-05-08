@@ -102,16 +102,35 @@ JSONL, append-only:
 
 User reviews this file and decides. Production exposes a CLI or skill (`patchbay:research --review-failures`) that reads it and offers escalation per entry.
 
-### Tier-2 escalation (Claude_in_Chrome)
+### Tier-2 escalation (Claude_in_Chrome) — VALIDATED in spike 003b
 
-When the user opts to escalate to tier 2, the production flow drives the user's actual Chrome via the `Claude_in_Chrome` MCP server. This is **indistinguishable from a human** because it IS a human user's browser.
+When the user opts to escalate to tier 2, the production flow drives the user's actual Chrome via the `Claude_in_Chrome` MCP server. This is **indistinguishable from a human** because it IS a human user's browser. **`get_page_text` returns the full DOM as structured plain text in one call** — the gold-standard ingest API when available.
 
-Pattern:
-1. **Precheck:** `mcp__Claude_in_Chrome__list_connected_browsers` — if `[]`, the extension isn't connected. Surface install instructions to the user, do NOT proceed silently. (Failure mode validated in spike 003c.)
-2. `tabs_context_mcp` — get current tab info / create new tab
-3. `navigate` to the blocked URL
-4. `read_page` or `get_page_text` — extract the DOM content
-5. Pipe to the same chunker that processes manual user-paste
+Pattern (~10s end-to-end including page load):
+1. **Precheck:** `mcp__Claude_in_Chrome__list_connected_browsers` — if `[]`, the extension isn't connected. Surface install instructions to the user, do NOT proceed silently. (Failure mode validated in spike 003c, set up validated in 003b.)
+2. `mcp__Claude_in_Chrome__select_browser(deviceId=...)` — select the connected browser.
+3. `mcp__Claude_in_Chrome__tabs_context_mcp(createIfEmpty=true)` — get tab context, or create a new tab.
+4. **Use `browser_batch` to combine navigation + wait + (optional) screenshot** in a single call:
+   ```python
+   mcp__Claude_in_Chrome__browser_batch(actions=[
+       {"name": "navigate", "input": {"tabId": ..., "url": "..."}},
+       {"name": "computer", "input": {"tabId": ..., "action": "wait", "duration": 4}},
+       {"name": "computer", "input": {"tabId": ..., "action": "screenshot"}},
+   ])
+   ```
+5. `mcp__Claude_in_Chrome__get_page_text(tabId=...)` — pull the full DOM. **This is the actual ingest call** — returns the entire page's main-element text as structured plain text (preserves headings, lists, paragraph breaks).
+6. Pipe to the chunker. Same chunk schema as every other source class.
+
+**What tier 2 captures that lower tiers miss** (verified in spike 003b on the same Equipboard URL that all four tiers ran against):
+- 6 of 8 videos that user-paste (tier 0) missed because the user only pasted the highlighted excerpt
+- All 3 critic reviews with full text (tier 0 showed "0 critic reviews" — the user pasted only a sub-section)
+- "Used With" category rollup
+- Page metadata (added-by user, gear IQ score, add date)
+
+**What tier 2 DOESN'T capture** (where tier 3 is still needed):
+- Image-embedded text (knob labels printed on product photos, screen states in screenshots). Tier 3 vision reads these; tier 2 DOM does not.
+
+**Recommendation:** for image-rich product pages (gear pages with control-photo hero images, video-game-style UI screenshots), do tier 2 first for structured DOM + an optional tier-3 follow-up vision pass for image-embedded content. Both bypass Cloudflare; both run on the user's real Chrome session.
 
 ### Tier-3 escalation (computer-use + Claude vision) — VALIDATED in spike 003c
 
