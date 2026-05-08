@@ -1,0 +1,67 @@
+# Spike Wrap-Up Summary
+
+**Date:** 2026-05-08
+**Spikes processed:** 4
+**Feature areas:** Chunk schema · Manual ingestion · YouTube ingestion · Web scraping · Spike pattern (template)
+**Skill output:** [`.claude/skills/spike-findings-patchbay-plugin/`](../../.claude/skills/spike-findings-patchbay-plugin/)
+
+## Processed Spikes
+
+| # | Name | Type | Verdict | Feature Area |
+|---|------|------|---------|--------------|
+| 001 | vision-quality-pedal-manual | standard | ✓ VALIDATED | Manual ingestion + chunk schema |
+| 002a | yt-captions-only | comparison | ⚠ PARTIAL | YouTube ingestion (fallback layer) |
+| 002c | yt-multimodal-sampled | comparison | ✓ VALIDATED (secondary) | YouTube ingestion + chunk schema |
+| 003 | tiered-web-ingest | standard | ✓ VALIDATED | Web scraping + knowledge-graph chunk types |
+
+## Key Findings
+
+### Architecture is locked-in
+
+Three independent source classes (PDF manual, YouTube video, web pages) all serialize to the same chunk schema. The architecture from [`.planning/notes/knowledge-architecture.md`](../notes/knowledge-architecture.md) — gear-anchored, citation-traceable, provenance per chunk — holds across every source class tested.
+
+### Native Claude tools are the production path
+
+- Manual ingestion → Read tool's PDF support (up to 20 pages/call, native vision).
+- YouTube multimodal → ffmpeg samples frames, Read tool describes them. Same vision pipeline as manual ingest, different input source.
+- Web scraping → tier-1 `requests`/`curl` for cheap fetches; tier-2 `Claude_in_Chrome` MCP for blocked sites. Each tier maps to existing infrastructure; no new runtimes.
+
+### Knowledge-graph chunk types are higher-leverage than flat content
+
+`artist_usage` (gear↔artist edges with verification source) and `cross_ref` (gear↔gear `used_with` / `similar_in_category` edges) emerged as the highest-leverage additions to the chunk schema. They convert flat content into queryable relations: "what does Rhett Shull use?", "what's most often paired with Chase Bliss Clean?", "what compressors are similar?".
+
+### Cross-source corroboration is emergent
+
+Without explicit design, spike 003 surfaced 3 cross-source matches (Cali76, Empress, JHS Pulp 'N Peel — independently referenced by both Equipboard's similar-gear list and the Reddit review's comparison points). The schema's `cross_source_match_candidates` field captures this for free as ingestion proceeds.
+
+### Equipboard is a meta-aggregator
+
+Equipboard's `artist_usage` blocks already include verbatim text from YouTube reviews (e.g., Rhett Shull's full Chase Bliss Clean review, transcribed and surfaced inline). EB ingest delivers reviewer commentary without running the spike-002c multimodal pipeline for sources EB has already covered. This reorders source priority: EB provides transitive YT content for free.
+
+### YouTube is secondary
+
+User's source priority order, locked in after spike 002 verification: (1) Manual = backbone, (2) Web articles/reviews = primary external, (3) YouTube multimodal = secondary reference, (4) YouTube captions-only = fallback. YouTube *is* useful — especially for technique demos where seeing the host's hands matters — but it's not the primary research substrate.
+
+### Cheap-by-default + user-driven escalation works
+
+Spike 003's tiered architecture (try cheap fetch → log failures with structured metadata → user reviews and decides which to escalate) is the right shape for `patchbay:research`. Cost stays bounded; the user retains agency over when to spend more compute.
+
+### "Tier 0 / user-paste" is a real production tier
+
+When tier-1 blocks, the user pasting DOM content is a valid path — same chunk schema, just different `tier_label` in provenance. Documented in the failure log so the user can choose between tier-2 escalation and tier-0 paste.
+
+### Citation-count → recommendation is a free emergent feature
+
+User insight surfaced during spike 003: when an external resource (a specific YouTube tutorial, an article URL) is referenced from multiple ingested sources, the AI should surface it as "worth verifying." Captured as a seed at [`.planning/seeds/citation-count-recommendations.md`](../seeds/citation-count-recommendations.md). Trivial to build once `patchbay:research` ships — it's just a SQL group-by on the chunk store.
+
+## What's left to spike (deferred / nice-to-have)
+
+- **Tier-2 (Claude_in_Chrome) end-to-end on a real blocked URL** — proof-of-concept that the user-driven escalation actually delivers usable chunks. Documented as ready-to-execute in the web-scraping reference; just needs a session.
+- **Whisper-vs-captions quality comparison** for YouTube — only matters if 002c's quality is insufficient at scale, which it wasn't for the spike's test video.
+- **Citation-count aggregation** — already specified as a seed; build alongside `patchbay:research`.
+
+These are nice-to-haves. The core architecture is sufficiently validated to start planning `patchbay:ingest` and `patchbay:research` as real phases.
+
+## Routing for future conversations
+
+The skill at [`.claude/skills/spike-findings-patchbay-plugin/`](../../.claude/skills/spike-findings-patchbay-plugin/) auto-loads in implementation work via the routing line in [CLAUDE.md](../../CLAUDE.md). Future build sessions read the SKILL.md + relevant references and don't need to re-derive these decisions.

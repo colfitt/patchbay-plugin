@@ -1,0 +1,19 @@
+# patchbay:research — fetch failures log
+#
+# Schema (one entry per failed fetch attempt):
+#   - timestamp:    ISO 8601
+#   - url:          The URL that failed
+#   - tier_attempted: 1 (static) | 2 (browser) | 3 (visual)
+#   - http_status:  HTTP status code (or null if non-HTTP error)
+#   - reason:       Short machine-readable reason (cloudflare-block | bot-detected | js-required | rate-limited | paywall | 404 | timeout | other)
+#   - reason_detail: Free-text human-readable explanation
+#   - suggested_escalation: 2 | 3 | manual-paste | skip
+#   - last_attempted: ISO 8601 of most recent retry
+#   - retry_count: int
+#
+# Format: one JSON object per line (jsonl).
+# Production behavior: append-only. User reviews this file and decides which
+# entries to escalate (move to a separate "queue" file for tier-2/3 attempts).
+
+{"timestamp": "2026-05-08T20:30:00Z", "url": "https://equipboard.com/items/chase-bliss-audio-clean", "tier_attempted": 1, "http_status": 403, "reason": "cloudflare-block", "reason_detail": "Server returned 403 with Cloudflare 'Just a moment...' challenge page (5.4KB body, content-security-policy referencing challenges.cloudflare.com). Both default and real-Chrome User-Agent headers were tried. Tier-1 static fetch cannot pass the JS challenge.", "suggested_escalation": 2, "last_attempted": "2026-05-08T20:30:00Z", "retry_count": 2}
+{"timestamp": "2026-05-08T20:30:00Z", "url": "https://www.reddit.com/r/guitarpedals/comments/1gyt83o/chase_bliss_clean_a_comprehensive_review/", "tier_attempted": 1, "http_status": 200, "reason": null, "reason_detail": "SUCCESS via .json suffix endpoint — 392KB JSON returned with full post and 64 top-level comments. No escalation needed.", "suggested_escalation": null, "last_attempted": "2026-05-08T20:30:00Z", "retry_count": 1}
