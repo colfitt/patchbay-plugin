@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spike 001 — vision-quality on MPC Sample manual</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --panel: #18181b;
+    --border: #2a2a30;
+    --text: #e4e4e7;
+    --muted: #a1a1aa;
+    --accent: #f97316;
+    --accent-dim: #92400e;
+    --img-bg: #1c1c20;
+    --code-bg: #111114;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font: 14px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  }
+  header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  h1 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+  .sub { color: var(--muted); font-size: 12px; }
+  nav {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    position: sticky; top: 0; z-index: 10;
+  }
+  nav button {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  nav button:hover { border-color: var(--accent-dim); }
+  nav button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0f0f10;
+    font-weight: 600;
+  }
+  nav .label { color: var(--muted); margin-right: 8px; align-self: center; font-size: 12px; }
+  main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+    padding: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .pane { min-width: 0; }
+  .pane h2 {
+    margin: 0 0 12px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .image-wrap {
+    background: var(--img-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    position: sticky;
+    top: 80px;
+  }
+  .image-wrap img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+  }
+  .chunks { display: flex; flex-direction: column; gap: 12px; }
+  .chunk {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .chunk-meta {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 10px;
+    font-size: 11px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .badge.text { background: #1e3a5f; color: #93c5fd; }
+  .badge.image { background: #4a2419; color: #fdba74; }
+  .badge.cat {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .chunk-id {
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    margin-left: auto;
+  }
+  .chunk-body {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .chunk-body strong { color: #fef3c7; }
+  .provenance {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--muted);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+  }
+  .stats {
+    display: flex; gap: 16px;
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .stats span strong { color: var(--text); }
+  /* Two-column always — keep source and chunks side-by-side at any width.
+     On narrow viewports the image gets smaller but stays visible. */
+</style>
+</head>
+<body>
+<header>
+  <h1>Spike 001 — vision quality on MPC Sample manual</h1>
+  <div class="sub">For each page: rendered PDF on the left, chunks Claude produced on the right. Judge usefulness for citation-hover RAG.</div>
+</header>
+<nav id="nav">
+  <span class="label">Page:</span>
+</nav>
+<main>
+  <div class="pane">
+    <h2>Source page</h2>
+    <div class="image-wrap"><img id="page-img" alt=""></div>
+  </div>
+  <div class="pane">
+    <h2>Produced chunks</h2>
+    <div class="stats" id="stats"></div>
+    <div class="chunks" id="chunks"></div>
+  </div>
+</main>
+<script>
+const CHUNKS = [
+  {
+    "id": "p001-c01",
+    "page": 1,
+    "type": "image",
+    "image_category": "marketing",
+    "description": "Front cover. Top half: AKAI Professional logo (red italic serif) and 'MPC SAMPLE' wordmark (red, futuristic), with subtitle 'User Guide v1.3.0 (RevA)'. Below: a 6-column geometric pattern grid filling the lower two-thirds of the page — black-and-white abstract motifs (triangles, circles, waves, arrows, sound-wave shapes, pad-grid icons, a Statue-of-Liberty silhouette, stars, brushstrokes). Marketing/brand-art only; no informational content.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 1, "rough_region": "full-page" }
+  },
+  {
+    "id": "p005-c01",
+    "page": 5,
+    "type": "text",
+    "content": "## Connection Diagram\n\nPictured below is an example of how to set up MPC Sample with other equipment. Note that items not listed under the Box Contents are sold separately.\n\nProceed to the Features chapter for more information on these connections.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 5, "rough_region": "top" }
+  },
+  {
+    "id": "p005-c02",
+    "page": 5,
+    "type": "image",
+    "image_category": "signal-flow",
+    "description": "Signal-flow / connection diagram. Centered: rear panel of the MPC Sample showing labeled ports left-to-right: PHONES, SYNC OUT, MIDI OUT, MIDI IN, AUDIO OUT (2/R, 1/L), AUDIO IN (2/R, 1/L), REC GAIN, USB, POWER. Cables drawn from each port radiate out to peripherals: Headphones (left), External Sound Module shown as a rack mixer (lower-left, into MIDI OUT), Speakers (pair of monitor speakers, into AUDIO OUT), Microphone (condenser mic into AUDIO IN), microSD Card (icon, top-right, no cable — slot is on left side), Power adapter with warning triangle marked '(Adapter not included)' (right), Computer or Smartphone (laptop+phone illustration, into USB). All connections are line-drawn, no color.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 5, "rough_region": "middle" }
+  },
+  {
+    "id": "p015-c01",
+    "page": 15,
+    "type": "text",
+    "content": "## Features\n\nThis chapter describes the functions of MPC Sample's connections and controls. Click on the picture to jump directly to the selected control.\n\nFor more information on using some of the features described below, proceed to the following Operation chapter.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 15, "rough_region": "top" }
+  },
+  {
+    "id": "p015-c02",
+    "page": 15,
+    "type": "image",
+    "image_category": "panel-diagram",
+    "description": "Rear panel photo of MPC Sample with 9 red numbered callouts. Left to right along the rear edge: callout 8 (PHONES jack), callout 7 (SYNC OUT), callout 6 (MIDI OUT/IN pair), callout 5 (AUDIO OUT 2/R and 1/L jacks), callout 4 (AUDIO IN 2/R and 1/L jacks), callout 3 (REC GAIN knob), callout 2 (USB-C port), callout 1 (POWER button). Callout 9 references the microSD Card Slot which is noted in the text as being on the left side and not pictured in this view.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 15, "rough_region": "middle" }
+  },
+  {
+    "id": "p015-c03",
+    "page": 15,
+    "type": "text",
+    "content": "1. POWER: Press this button to turn MPC Sample's power on and off.\n2. USB-C Port: To power MPC Sample and charge the internal battery, use the included USB-C cable to connect this port to a USB-C power adapter or USB-C power bank (not included). When charging, the Charging Icon on the top panel lights up. You can also connect this to a USB-C host port on your computer (or mobile device) to send and receive audio and MIDI, and transfer files to and from a microSD card inserted into the microSD Card Slot. Important: Depending on the type of USB cable and power source used, charging of MPC Sample may be limited to when it is powered off only. For best results, use the included USB-C cable with a minimum 5V, 2A power source.\n3. REC GAIN: Turn this knob to adjust the recording level of the line-level AUDIO IN connections.\n4. AUDIO IN (1/4\" [6.35 mm], TRS): Use these inputs to connect a microphone, instrument, or other line-level audio source (mixer, synthesizer, drum machine, etc.).\n5. AUDIO OUT (1/4\" [6.35 mm], TRS): Use these outputs to connect to your speakers, a mixer, or other audio output destination. Use the MAIN VOLUME control to adjust the level of the audio output.\n6. MIDI IN / OUT (1/8\" [3.5 mm], TRS [Type A]): Connect external MIDI devices such as drum machines or synthesizers to the MIDI Input and Output using 1/8\" TRS (Type A) to 5-Pin MIDI DIN connectors (not included).\n7. SYNC OUT (1/8\" [3.5 mm], TS): Use this 5V control voltage (CV) output to send clock pulse for syncing external modular gear. Note: You can adjust MIDI and Sync settings in the MIDI Configuration menu.\n8. PHONES (1/8\" [3.5 mm], TRS): Connect standard headphones here to monitor MPC Sample's audio. Use the MAIN VOLUME control to adjust the level of the headphones output. When headphones are connected, the built-in Speaker will be deactivated.\n9. microSD Card Slot (Left side, not pictured): Insert a microSD card here for external file storage. You can access this storage using SD Card Access Mode in the Project menu.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 15, "rough_region": "bottom" }
+  },
+  {
+    "id": "p016-c01",
+    "page": 16,
+    "type": "image",
+    "image_category": "panel-diagram",
+    "description": "Top-down photo of MPC Sample's full top panel with 40 red numbered callouts. Top row: 13 (MAIN VOLUME knob, top-left, with 'MAIN VOLUME' label), 11 (Battery Icon, small green LED next to display), 12 (Charging Icon, lightning-bolt LED), 10 (Display, full-color screen showing a Trim view with sample waveform), 20 (the bank/page tabs printed on the display bezel: 'F G H' and 'A B C D'), 14 (Meters, vertical LED stack to right of display), 15 (Speaker, circular grille upper-right). Mode-button row directly below display: 29 (SAMPLE / INPUT CONFIG), 30 (SEQ / STEP EDIT), 31 (PAD FX / FLEX BEAT), 32 (KNOB FX / FX SELECT). Three knobs labeled K1, K2, K3 directly under display: callout 21. Pad Play row to the right: 33 (CHOP / NOTE ON), 35 (MUTE / UNMUTE ALL), 34 (LOOP / REVERSE), 36 (16 LEVELS / TYPE). Center column: 17 (SHIFT button), 25 (PAD BANK button), 26 (SAMPLE SELECT / SAVE SAMPLE), 27 (TAP TEMPO / METRO), 16 (microphone icon — built-in mic). Right side: 18 (Encoder, large central knob), 19 (-/+ UNDO/REDO buttons). Left edge: 22 (Fader, vertical slider). Bottom-left: 23 (ERASE / COPY), 24 (NOTE REPEAT / TRIPLET). Right of pads: 37 (SAMPLE RECORD / RECALL), 38 (SEQ RECORD / RECALL), 40 (STOP, square icon), 39 (PLAY / CONTINUE, triangle icon). 28 (the 4×4 pad grid, pads 1–16, with secondary functions printed above each pad: '1 FULL LEVEL', '2 HALF SEQ', '3 DOUBLE SEQ', '4 COUNT-IN', '5 COMPRESSOR', '6 HALF SPEED', '7 DOUBLE SPEED', '8 MIDI CONFIG', '9 FADER', '10 REC QUANTIZE', '11 RESAMPLE', '12 SONG', '13 TRIM SAMPLE', '14 TIME CORRECT', '15 WARP', '16 PROJECT').",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 16, "rough_region": "top" }
+  },
+  {
+    "id": "p016-c02",
+    "page": 16,
+    "type": "image",
+    "image_category": "icon",
+    "description": "Battery icon: small horizontal green bar (battery indicator at full charge state).",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 16, "rough_region": "middle" }
+  },
+  {
+    "id": "p016-c03",
+    "page": 16,
+    "type": "image",
+    "image_category": "icon",
+    "description": "Charging icon: black lightning-bolt symbol on white background.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 16, "rough_region": "bottom" }
+  },
+  {
+    "id": "p016-c04",
+    "page": 16,
+    "type": "text",
+    "content": "10. Display: The display on MPC Sample shows the various menus and parameters available. To learn more about all of MPC Sample's features and functions, continue reading below and proceed to the Operation chapter for more details.\n\n11. Battery Icon: This icon shows the current battery life of MPC Sample. If this icon is green, the battery has between 100% and 30% charge. If the icon is amber, the battery has between 29% and 15% charge. If the icon is red, the battery has between 14% and 5% charge. If the battery is blinking red, the battery has less than 5% charge and needs to be connected to power immediately.\n\n12. Charging Icon: This icon lights up when MPC Sample is connected to power and charging. If MPC Sample is not connected to power, or if the battery is fully charged, the icon does not light up.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 16, "rough_region": "bottom" }
+  },
+  {
+    "id": "p024-c01",
+    "page": 24,
+    "type": "text",
+    "content": "## Operation\n\nThis chapter describes MPC Sample's different modes, functions, and menus.\n\nFor more information on specific controls or connections, refer to the previous Features chapter.\n\n### Sample Mode\n\nSample Mode is the \"main\" mode of MPC Sample, where you can trigger your samples, view and edit their parameters, and more.\n\nTo open Sample Mode, press the SAMPLE button.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 24, "rough_region": "top" }
+  },
+  {
+    "id": "p024-c02",
+    "page": 24,
+    "type": "image",
+    "image_category": "button-icon",
+    "description": "SAMPLE button rendering: rounded rectangular button with 'SAMPLE' label printed on the cap and 'INPUT CONFIG' printed below as the secondary (shift) function.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 24, "rough_region": "top" }
+  },
+  {
+    "id": "p024-c03",
+    "page": 24,
+    "type": "image",
+    "image_category": "screen-screenshot",
+    "description": "Sample Mode display screenshot. Black background. Top tab row: 'Trim', 'Tune', 'Filter' (Trim selected/highlighted). Below: pad/sample identifier 'A01' and sample name 'BoomBap-Kik-BTB MD' with mode-toggle icons on the right (one-shot/loop indicators, sync-rate '16'). Two stacked yellow waveform views (stereo L/R) showing the sample shape. Bottom labels for the K1-K3 knob assignments: 'Start', 'End', 'Loop' with a small lock icon next to Loop.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 24, "rough_region": "middle" }
+  },
+  {
+    "id": "p024-c04",
+    "page": 24,
+    "type": "text",
+    "content": "Press a PAD to trigger it and view its sample on the display.\n\nTo select and view a sample without triggering it, press and hold the SAMPLE button and press a PAD.\n\nTurn the K1-K3 Knobs to select and adjust parameters as described below.\n\nAlternatively, press the ENCODER to cycle between the K1-K3 parameters at the bottom of the screen, and then turn the ENCODER or press the -/+ buttons to adjust the selected parameter. You can also press and hold SHIFT and press the ENCODER to cycle backwards between the parameters.\n\nPress and hold SHIFT to access these additional parameters using the B1 and B2 Function Buttons.\n- SHIFT+B1 — Loop Lock: Activate or deactivate loop lock. When activated, loop start is locked to the sample start.\n- SHIFT+B2 — Normalize: Apply normalization to the sample, adjusting the audio level between the sample start point and end point so that the maximum peak level is set to 0 dB.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 24, "rough_region": "bottom" }
+  },
+  {
+    "id": "p025-c01",
+    "page": 25,
+    "type": "image",
+    "image_category": "screen-screenshot",
+    "description": "Side-by-side pair of Trim screenshots showing the same Trim/Tune/Filter top tabs. Left image: 'Trim' tab active, sample 'A01 BoomBap-Kik-BTB MD' with two stacked yellow waveforms and bottom knob assignments 'Start | End | Loop'. Right image: same view in 'Loop Lock / Normalize' state — sample 'A10 HipHop-Pro-BeYou B6 OS' with the bottom labels changed to 'Zoom: Start | Zoom: End | Zoom: Loop' (showing the SHIFT-modified zoom controls).",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 25, "rough_region": "top" }
+  },
+  {
+    "id": "p025-c02",
+    "page": 25,
+    "type": "image",
+    "image_category": "screen-screenshot",
+    "description": "Mix screen screenshot. 'Mix' tab active (replacing 'Trim' in the top row, alongside 'Tune' and 'Filter'). Same waveform display for sample 'A01 BoomBap-Kik-BTB MD'. Bottom knob labels show 'Volume' (K1) on the left and 'Pan' (K3) on the right with K2 unlabeled in the middle (Kit Volume requires SHIFT).",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 25, "rough_region": "middle" }
+  },
+  {
+    "id": "p025-c03",
+    "page": 25,
+    "type": "text",
+    "content": "Trim — K1 Start: Adjust the sample start point (0–100%). SHIFT+K1 Zoom Start: Zoom in or out of the sample waveform at the sample start point (0–100%). K2 End: Adjust the sample end point (0–100%). SHIFT+K2 Zoom End: Zoom at the sample end point (0–100%). K3 Loop: Adjust the loop point (0–100%). SHIFT+K3 Zoom Loop: Zoom at the loop point (0–100%). Note: When Chop Mode is enabled, the Trim controls are replaced by Chop controls.\n\nMix — K1 Volume: Adjust the sample volume (-INF, -74.00 to +6.00 dB). The vertical meter to the left of the sample waveform displays the current volume setting. SHIFT+K2 Kit Volume: Adjust the kit volume (-INF, -74.00 to +6.00 dB). K3 Pan: Adjust the left/right stereo panning (50L–C–50R). The vertical meter to the right displays the current pan setting.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 25, "rough_region": "bottom" }
+  },
+  {
+    "id": "p026-c01",
+    "page": 26,
+    "type": "image",
+    "image_category": "screen-screenshot",
+    "description": "Amp Env (amplitude envelope) screen screenshot. 'Amp Env' tab active alongside 'Tune' and 'Filter'. Sample 'A09 Trap-Vox-Zen3 91V'. Single yellow waveform view occupies most of the screen, with a green ADSR-style envelope curve overlaid on the right side showing the decay/release shape. Bottom knob labels: 'Attack | Decay | Vel Sens'.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 26, "rough_region": "top" }
+  },
+  {
+    "id": "p026-c02",
+    "page": 26,
+    "type": "text",
+    "content": "Amp Env — Use these functions to adjust the amplitude envelope of the sample, which allow you to change the sample dynamics.\n\nK1 Attack: Adjust the attack phase of the amplitude envelope (0–127). This determines how quickly the sound fades in from the sample start point.\n\nK2 Decay: When the sample is set to One Shot playback, use this knob to adjust the decay phase of the amplitude envelope (0–127). This determines how quickly the sound fades out, either from the sample start point or end point. SHIFT+K2 Decay From: This setting determines whether the decay phase is applied to the sample Start or End when set to One Shot playback.\n\nK2 Release: When the sample is set to Note On playback, use this knob to adjust the release phase of the amplitude envelope (0–127). This determines how quickly the sound fades out when the pad is released.\n\nK3 Vel Sens: This setting determines how responsive the sample level is to your playing dynamics (0–127). When set to 127, the pads are the most responsive to your playing dynamics; when set to 0, the sample plays at full velocity no matter how soft or hard you hit the pad.",
+    "provenance": { "manual": "MPC Sample - User Guide - v1.3.pdf", "page": 26, "rough_region": "bottom" }
+  }
+];
+const pages = [...new Set(CHUNKS.map(c => c.page))].sort((a,b) => a-b);
+const nav = document.getElementById('nav');
+const img = document.getElementById('page-img');
+const chunksEl = document.getElementById('chunks');
+const statsEl = document.getElementById('stats');
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+function renderPage(p) {
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', +b.dataset.page === p));
+  img.src = `pages-rendered/page-${pad2(p)}.png`;
+  img.alt = `Page ${p}`;
+  const pageChunks = CHUNKS.filter(c => c.page === p);
+  const textCount = pageChunks.filter(c => c.type === 'text').length;
+  const imgCount = pageChunks.filter(c => c.type === 'image').length;
+  statsEl.innerHTML =
+    `<span><strong>${pageChunks.length}</strong> chunks</span>` +
+    `<span><strong>${textCount}</strong> text</span>` +
+    `<span><strong>${imgCount}</strong> image</span>`;
+  chunksEl.innerHTML = pageChunks.map(c => {
+    const typeBadge = `<span class="badge ${c.type}">${c.type}</span>`;
+    const catBadge = c.image_category ? `<span class="badge cat">${escapeHtml(c.image_category)}</span>` : '';
+    const body = c.type === 'image'
+      ? escapeHtml(c.description || '')
+      : escapeHtml(c.content || '');
+    const prov = c.provenance
+      ? `${escapeHtml(c.provenance.manual)} · page ${c.provenance.page} · ${escapeHtml(c.provenance.rough_region || '—')}`
+      : '';
+    return `<div class="chunk">
+      <div class="chunk-meta">
+        ${typeBadge}${catBadge}
+        <span class="chunk-id">${escapeHtml(c.id)}</span>
+      </div>
+      <div class="chunk-body">${body}</div>
+      <div class="provenance">${prov}</div>
+    </div>`;
+  }).join('');
+}
+
+pages.forEach((p, i) => {
+  const b = document.createElement('button');
+  b.textContent = `p${p}`;
+  b.dataset.page = p;
+  b.onclick = () => renderPage(p);
+  nav.appendChild(b);
+});
+
+if (pages.length) renderPage(pages[0]);
+</script>
+</body>
+</html>

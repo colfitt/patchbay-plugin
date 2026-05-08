@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "spike-001-viewer",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8765", "--directory", ".planning/spikes/001-vision-quality-pedal-manual"],
+      "port": 8765
+    }
+  ]
+}
