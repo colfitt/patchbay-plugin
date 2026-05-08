@@ -70,11 +70,13 @@ The "watch this video" recommendation feedback loop.
 
 ## Traceability
 
-(Filled in during roadmap creation — maps each REQ-ID to its phase.)
+Each REQ-ID maps to exactly one phase. Coverage verified during roadmap creation: **24 / 24** requirements mapped.
 
 | Phase | Requirements |
 |-------|--------------|
-| TBD | TBD |
+| Phase 2 — Chunk schema + patchbay:ingest | CHUNK-01, CHUNK-02, CHUNK-03, CHUNK-04, CHUNK-05, INGEST-01, INGEST-02, INGEST-03, INGEST-04, INGEST-05, INGEST-06 |
+| Phase 3 — patchbay:research with tiered fetch | RESEARCH-01, RESEARCH-02, RESEARCH-03, RESEARCH-04, RESEARCH-05, RESEARCH-06, RESEARCH-07, RESEARCH-08, RESEARCH-09 |
+| Phase 4 — Citation tracking + recommendations | CITATION-01, CITATION-02, CITATION-03, CITATION-04 |
 
 ---
-*Last updated: 2026-05-08 — milestone v2.0 (gear-knowledge) requirements defined*
+*Last updated: 2026-05-08 — milestone v2.0 (gear-knowledge) traceability filled in during roadmap creation*
