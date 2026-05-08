@@ -47,7 +47,7 @@ v2.0 builds the gear-knowledge substrate so downstream skills (and the eventual 
   4. Each manual page produces 1-4 chunks split by content block (text section vs image vs control close-up), and multi-page manuals (>20 pages) ingest cleanly with no gaps where the Read-tool batch boundaries fall.
   5. Re-running `/patchbay:ingest` on a gear that already has chunks shows a diff and asks the user to confirm before overwriting; user-edited chunks (whether edited directly in `chunks.jsonl` or via a per-chunk markdown export) survive the re-ingest.
   6. The schema supports `artist_usage`, `cross_ref`, and `external_resource` chunk types as additive fields so Phase 3 and Phase 4 can write the same JSONL file without further schema changes.
-**Plans:** TBD
+**Plans:** 3 (01-schema-reference → 02-skill-body → 03-verify; sequential)
 **UI hint:** no (skill outputs are JSONL + markdown only; UI rendering is a future milestone)
 
 ### Phase 3: patchbay:research with tiered fetch
@@ -83,7 +83,7 @@ Phases execute in numeric order: 2 → 3 → 4
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Build dialed-in skill | v1.0 | 1/1 | Complete | 2026-05-07 |
-| 2. Chunk schema + patchbay:ingest | v2.0 | 0/TBD | Not started | - |
+| 2. Chunk schema + patchbay:ingest | v2.0 | 0/3 | Planning complete | - |
 | 3. patchbay:research with tiered fetch | v2.0 | 0/TBD | Not started | - |
 | 4. Citation tracking + recommendations | v2.0 | 0/TBD | Not started | - |
 
