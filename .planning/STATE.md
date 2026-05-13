@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: gear-knowledge
-status: ready_to_plan
-last_updated: "2026-05-08T00:00:00.000Z"
-last_activity: 2026-05-08
+status: phase_2_complete
+last_updated: "2026-05-12T00:00:00.000Z"
+last_activity: 2026-05-12
 progress:
   total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 1
+  total_plans: 3
+  completed_plans: 3
+  percent: 33
 ---
 
 # Project State
@@ -20,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Every artifact this plugin produces must remain a useful, source-cited markdown file in the user's local filesystem — searchable today, renderable as UI tomorrow.
-**Current focus:** Phase 2 — Chunk schema + patchbay:ingest
+**Current focus:** Phase 3 — patchbay:research with tiered fetch (ready to plan)
 
 ## Current Position
 
-Phase: 2 of 4 (Chunk schema + patchbay:ingest) — first phase of v2.0
+Phase: 3 of 4 (patchbay:research with tiered fetch) — second phase of v2.0
 Plan: — (not yet planned)
-Status: Ready to plan
-Last activity: 2026-05-08 — Roadmap created for v2.0 (gear-knowledge); 24 requirements mapped across 3 phases (2, 3, 4)
+Status: Phase 2 complete (VERIFIED); ready to plan Phase 3
+Last activity: 2026-05-12 — Phase 2 executed end-to-end: 3 plans shipped + verification against Boss BF-3 (13 chunks produced; preservation test passed; multi-batch test deferred)
 
-Progress: [░░░░░░░░░░] 0% (v2.0 only)
+Progress: [███░░░░░░░] 33% (v2.0 only — 1 of 3 phases complete)
 
 ## Performance Metrics
 
@@ -45,8 +45,8 @@ Progress: [░░░░░░░░░░] 0% (v2.0 only)
 | 1 (v1.0) | 1 | — | — |
 
 **Recent Trend:**
-- Last plan: Phase 1 (dialed-in) shipped 2026-05-07
-- Trend: New milestone starting
+- Last plan: Phase 2 / Plan 03 (verify) shipped 2026-05-12
+- Trend: Phase 2 complete — patchbay-ingest skill verified end-to-end against real owned-gear manual
 
 *Updated after each plan completion*
 
@@ -64,7 +64,12 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- **Multi-batch boundary verification (INGEST-03 deferral)** — re-verify on first ingest of a >20-page manual (candidates in Pedalxly inventory: Akai MPC Sample, Strymon TimeLine, Roland VG-800, Eventide H90). Tracked in `docs/verify/02-chunk-schema-and-patchbay-ingest.md` § Multi-batch boundary test.
+- **Phase 2 findings (4) for future spikes / Phase 2.1 if needed:**
+  1. Foldout-poster manuals violate the "1–4 chunks/page" rule wording — rule needs revision (substance is correct).
+  2. SKILL.md should explicitly require a real JSON encoder for chunk writing (`json.dumps`/`JSON.stringify`) — raw `\n` in strings breaks RFC 8259.
+  3. State-transition tables are a real edge case for the 7-category enum — candidate eighth category (`state-diagram`) for a future spike.
+  4. Pedalxly's top-level `Manuals/` folder is unused; future `add-gear`/`soundcheck` could route from there into gear folders.
 
 ### Blockers/Concerns
 
@@ -82,6 +87,6 @@ None yet. Architecture is heavily pre-validated by spike findings; the `spike-fi
 
 ## Session Continuity
 
-Last session: 2026-05-08
-Stopped at: Roadmap created for v2.0 — Phase 2 ready to plan
+Last session: 2026-05-12
+Stopped at: Phase 2 verified end-to-end against Boss BF-3 — ready to plan Phase 3 (patchbay:research with tiered fetch)
 Resume file: None

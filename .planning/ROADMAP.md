@@ -30,7 +30,7 @@ v2.0 builds the gear-knowledge substrate so downstream skills (and the eventual 
 
 **Milestone Goal:** Ship `patchbay:ingest`, `patchbay:research`, the unified chunk schema + per-gear knowledge store, and the citation-count recommendation feedback loop.
 
-- [ ] **Phase 2: Chunk schema + patchbay:ingest** — Lock the load-bearing chunk schema in production code and ship `/patchbay:ingest` for manual PDFs (the simplest source class).
+- [x] **Phase 2: Chunk schema + patchbay:ingest** — Lock the load-bearing chunk schema in production code and ship `/patchbay:ingest` for manual PDFs (the simplest source class). **Shipped 2026-05-12. Verified against Boss BF-3.**
 - [ ] **Phase 3: patchbay:research with tiered fetch** — Ship `/patchbay:research` covering web articles, Reddit, Equipboard, and YouTube via the cheap-by-default + user-driven escalation tier ladder.
 - [ ] **Phase 4: Citation tracking + recommendations** — Aggregate `external_resource` chunks across sources and surface "watch this" recommendations once an external URL is referenced N times.
 
@@ -83,7 +83,7 @@ Phases execute in numeric order: 2 → 3 → 4
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Build dialed-in skill | v1.0 | 1/1 | Complete | 2026-05-07 |
-| 2. Chunk schema + patchbay:ingest | v2.0 | 0/3 | Planning complete | - |
+| 2. Chunk schema + patchbay:ingest | v2.0 | 3/3 | Complete (VERIFIED) | 2026-05-12 |
 | 3. patchbay:research with tiered fetch | v2.0 | 0/TBD | Not started | - |
 | 4. Citation tracking + recommendations | v2.0 | 0/TBD | Not started | - |
 
