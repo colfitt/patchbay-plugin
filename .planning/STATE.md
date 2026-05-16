@@ -4,14 +4,14 @@ milestone: v2.0
 milestone_name: gear-knowledge
 status: executing
 stopped_at: "Phase 2 verified end-to-end against Boss BF-3 — ready to plan Phase 3 (patchbay:research with tiered fetch)"
-last_updated: "2026-05-16T01:50:10.230Z"
+last_updated: "2026-05-16T01:57:36.921Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (patchbay:research with tiered fetch) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-05-16
 
-Progress: [██░░░░░░░░] 20%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [██░░░░░░░░] 20%
 
 *Updated after each plan completion*
 | Phase 03 P01 | 8min | 2 tasks | 9 files |
+| Phase 03 P03-02 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Self-registering source-class registry pattern — Plans 02/03/04 add one import line each; generic = REGISTRY[-1] — Keeps registry skeleton genuinely empty; commutative merges across Wave 2 plans
 - [Phase 03]: Bidirectional name extraction for cross_source_match_candidates — Required because possessive variants (Rhett Shull's) don't substring-match the bare form; one-directional scan missed the test case
 - [Phase 03]: update_chunk_field landed in Plan 01 (not Plan 04) — Plan 04 YouTube two-pass enrichment becomes a 4-line change instead of a 4-file change; load-bearing helper deserves to ship with its tests
+- [Phase 03]: Self-registration idempotency guard — every source-class module wraps the REGISTRY append in 'if _self not in _REGISTRY' so importlib.reload cycles don't double-register
+- [Phase 03]: Chunk IDs grounded on data.id (Reddit-assigned post id), not URL slug — slugs can be edited by mods; data.id is the stable join key for re-ingest diffs
 
 ### Pending Todos
 
@@ -94,6 +97,6 @@ None yet. Architecture is heavily pre-validated by spike findings; the `spike-fi
 
 ## Session Continuity
 
-Last session: 2026-05-16T01:49:23.264Z
+Last session: 2026-05-16T01:57:32.332Z
 Stopped at: Phase 2 verified end-to-end against Boss BF-3 — ready to plan Phase 3 (patchbay:research with tiered fetch)
 Resume file: None

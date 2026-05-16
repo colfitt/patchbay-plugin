@@ -66,7 +66,7 @@ Plans:
 - [x] 03-01-PLAN.md — Tier-1 fetch core + failures.log writer + URL router + chunk writer w/ cross-source emergence (RESEARCH-01/02/03/09)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 03-02-PLAN.md — Source class: Reddit `.json` cheap path (RESEARCH-06)
+- [x] 03-02-PLAN.md — Source class: Reddit `.json` cheap path (RESEARCH-06)
 - [ ] 03-03-PLAN.md — Source class: Equipboard `artist_usage` + `cross_ref` chunks (RESEARCH-08)
 - [ ] 03-04-PLAN.md — Source class: YouTube multimodal (yt-dlp + parse_vtt + ffmpeg + Read vision; no Whisper) (RESEARCH-07)
 
