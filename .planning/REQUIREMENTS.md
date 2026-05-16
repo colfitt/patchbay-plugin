@@ -39,7 +39,7 @@ Multi-source web ingest with tiered fetch + user-driven escalation.
 - [ ] **RESEARCH-04**: User can review `failures.log` via a sub-command (`/patchbay:research --review-failures`) and choose, per entry, to escalate to tier 2, tier 3, paste manually, or skip. **No auto-fallback** between tiers.
 - [ ] **RESEARCH-05**: Tier-2 escalation prechecks `mcp__Claude_in_Chrome__list_connected_browsers`; if empty, surfaces extension install instructions instead of failing silently.
 - [x] **RESEARCH-06**: Reddit URLs (`reddit.com/r/.../comments/...`) automatically use the `?.json` suffix path at tier 1 — no escalation required for that source class.
-- [ ] **RESEARCH-07**: YouTube URLs are ingested multimodally (yt-dlp captions + `parse_vtt.py` + ffmpeg frame sampling at 30s + Read tool vision per frame). Auto-captions are sufficient — no Whisper dependency.
+- [x] **RESEARCH-07**: YouTube URLs are ingested multimodally (yt-dlp captions + `parse_vtt.py` + ffmpeg frame sampling at 30s + Read tool vision per frame). Auto-captions are sufficient — no Whisper dependency.
 - [x] **RESEARCH-08**: Equipboard pages produce `artist_usage` chunks (with verbatim review quotes when present) and `cross_ref` chunks (`used_with`, `similar_in_category`) per the chunk schema.
 - [x] **RESEARCH-09**: Cross-source corroboration is automatic — when ingestion notices a chunk references a name (gear/artist/external resource) that another already-ingested chunk also references, set `cross_source_match_candidates` on the chunk.
 

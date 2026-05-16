@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: gear-knowledge
 status: executing
-stopped_at: "Phase 2 verified end-to-end against Boss BF-3 — ready to plan Phase 3 (patchbay:research with tiered fetch)"
-last_updated: "2026-05-16T02:05:54.702Z"
+stopped_at: Completed 03-04-PLAN.md (YouTube source class — multimodal, no Whisper)
+last_updated: "2026-05-16T02:20:33.109Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (patchbay:research with tiered fetch) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-05-16
 
-Progress: [██████░░░░] 60%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [██████░░░░] 60%
 | Phase 03 P01 | 8min | 2 tasks | 9 files |
 | Phase 03 P03-02 | 4min | 2 tasks | 5 files |
 | Phase 03 P03-03 | 5min | 2 tasks | 5 files |
+| Phase 03 P04 | 7min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 03 Plan 03]: Two-pass emit pattern for citing_chunk_ids — any chunk type whose citing_chunk_ids references another chunk MUST emit AFTER the cited chunk. Plan 04 will hit this same constraint.
 - [Phase ?]: [Phase 03 Plan 03]: VERBATIM_QUOTE_MIN_CHARS = 80 — short text collapses into summary; only text >= 80 chars becomes verbatim_quote, honoring RESEARCH-08 without inventing quotes.
 - [Phase ?]: [Phase 03 Plan 03]: BeautifulSoup with html.parser (stdlib), NOT lxml — XXE/billion-laughs immune by parser choice (T-03-15/T-03-18).
+- [Phase 03]: Plan 03-04: Two-pass YouTube enrichment via <<PENDING_READ_TOOL_DESCRIPTION>> sentinel + provenance.frame_path; SKILL driver Reads each frame and overwrites via write_chunk.update_chunk_field.
+- [Phase 03]: Plan 03-04: Sentinel tier-1 fetch ({needs_pipeline: True}) for YouTube — SKILL driver dispatches parse_to_chunks directly, no static GET for /watch pages.
+- [Phase 03]: Plan 03-04: VTT windows anchored to first cue start (not fixed grid) so deep_link timestamps stay surgically aligned with content.
 
 ### Pending Todos
 
@@ -101,6 +105,6 @@ None yet. Architecture is heavily pre-validated by spike findings; the `spike-fi
 
 ## Session Continuity
 
-Last session: 2026-05-16T02:05:38.892Z
-Stopped at: Phase 2 verified end-to-end against Boss BF-3 — ready to plan Phase 3 (patchbay:research with tiered fetch)
+Last session: 2026-05-16T02:20:33.102Z
+Stopped at: Completed 03-04-PLAN.md (YouTube source class — multimodal, no Whisper)
 Resume file: None
