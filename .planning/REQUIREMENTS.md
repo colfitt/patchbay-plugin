@@ -33,15 +33,15 @@ Manual PDF → chunks. Backbone of the gear knowledge graph.
 
 Multi-source web ingest with tiered fetch + user-driven escalation.
 
-- [ ] **RESEARCH-01**: User can run `/patchbay:research <gear>` and get web sources ingested into the gear's `chunks.jsonl`.
-- [ ] **RESEARCH-02**: Tier-1 static fetch (`requests` + `BeautifulSoup`) is tried first for every URL. On HTTP non-2xx or detected anti-bot challenge, the failure is logged.
-- [ ] **RESEARCH-03**: `failures.log` is append-only JSONL with schema `{timestamp, url, tier_attempted, http_status, reason, reason_detail, suggested_escalation, last_attempted, retry_count}`. `reason` ∈ cloudflare-block / bot-detected / js-required / rate-limited / paywall / 404 / timeout / other. `suggested_escalation` ∈ `2 | 3 | "either" | "manual-paste" | "skip"`.
+- [x] **RESEARCH-01**: User can run `/patchbay:research <gear>` and get web sources ingested into the gear's `chunks.jsonl`.
+- [x] **RESEARCH-02**: Tier-1 static fetch (`requests` + `BeautifulSoup`) is tried first for every URL. On HTTP non-2xx or detected anti-bot challenge, the failure is logged.
+- [x] **RESEARCH-03**: `failures.log` is append-only JSONL with schema `{timestamp, url, tier_attempted, http_status, reason, reason_detail, suggested_escalation, last_attempted, retry_count}`. `reason` ∈ cloudflare-block / bot-detected / js-required / rate-limited / paywall / 404 / timeout / other. `suggested_escalation` ∈ `2 | 3 | "either" | "manual-paste" | "skip"`.
 - [ ] **RESEARCH-04**: User can review `failures.log` via a sub-command (`/patchbay:research --review-failures`) and choose, per entry, to escalate to tier 2, tier 3, paste manually, or skip. **No auto-fallback** between tiers.
 - [ ] **RESEARCH-05**: Tier-2 escalation prechecks `mcp__Claude_in_Chrome__list_connected_browsers`; if empty, surfaces extension install instructions instead of failing silently.
 - [ ] **RESEARCH-06**: Reddit URLs (`reddit.com/r/.../comments/...`) automatically use the `?.json` suffix path at tier 1 — no escalation required for that source class.
 - [ ] **RESEARCH-07**: YouTube URLs are ingested multimodally (yt-dlp captions + `parse_vtt.py` + ffmpeg frame sampling at 30s + Read tool vision per frame). Auto-captions are sufficient — no Whisper dependency.
 - [ ] **RESEARCH-08**: Equipboard pages produce `artist_usage` chunks (with verbatim review quotes when present) and `cross_ref` chunks (`used_with`, `similar_in_category`) per the chunk schema.
-- [ ] **RESEARCH-09**: Cross-source corroboration is automatic — when ingestion notices a chunk references a name (gear/artist/external resource) that another already-ingested chunk also references, set `cross_source_match_candidates` on the chunk.
+- [x] **RESEARCH-09**: Cross-source corroboration is automatic — when ingestion notices a chunk references a name (gear/artist/external resource) that another already-ingested chunk also references, set `cross_source_match_candidates` on the chunk.
 
 ### CITATION — Cross-source citation tracking
 
