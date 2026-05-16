@@ -60,7 +60,18 @@ v2.0 builds the gear-knowledge substrate so downstream skills (and the eventual 
   3. User can run `/patchbay:research --review-failures`, see each logged failure with its `suggested_escalation` (`2 | 3 | "either" | "manual-paste" | "skip"`), and choose per-entry whether to escalate to tier 2, tier 3, paste manually, or skip; tier-2 escalation prechecks `mcp__Claude_in_Chrome__list_connected_browsers` and surfaces install instructions when the result is `[]` rather than failing silently.
   4. Reddit URLs hit the `?.json` cheap path automatically at tier 1 with no escalation required; Equipboard pages produce `artist_usage` chunks (with verbatim review quotes when present) and `cross_ref` chunks (`used_with`, `similar_in_category`); YouTube URLs ingest multimodally (yt-dlp captions + `parse_vtt.py` + ffmpeg frame sampling at 30s + Read-tool vision per frame) without a Whisper dependency.
   5. When ingestion notices a chunk references a name (gear / artist / external resource) that another already-ingested chunk references, the new chunk has its `cross_source_match_candidates` field populated automatically — corroboration is emergent, not manually wired.
-**Plans:** TBD
+**Plans:** 5 plans
+Plans:
+**Wave 1**
+- [ ] 03-01-PLAN.md — Tier-1 fetch core + failures.log writer + URL router + chunk writer w/ cross-source emergence (RESEARCH-01/02/03/09)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 03-02-PLAN.md — Source class: Reddit `.json` cheap path (RESEARCH-06)
+- [ ] 03-03-PLAN.md — Source class: Equipboard `artist_usage` + `cross_ref` chunks (RESEARCH-08)
+- [ ] 03-04-PLAN.md — Source class: YouTube multimodal (yt-dlp + parse_vtt + ffmpeg + Read vision; no Whisper) (RESEARCH-07)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 03-05-PLAN.md — `--review-failures` interactive flow + tier-2 precheck + tier-3 vision (RESEARCH-04/05/09)
 **UI hint:** no (skill outputs are JSONL + markdown only; UI rendering is a future milestone)
 
 ### Phase 4: Citation tracking + recommendations
@@ -84,7 +95,7 @@ Phases execute in numeric order: 2 → 3 → 4
 |-------|-----------|----------------|--------|-----------|
 | 1. Build dialed-in skill | v1.0 | 1/1 | Complete | 2026-05-07 |
 | 2. Chunk schema + patchbay:ingest | v2.0 | 3/3 | Complete (VERIFIED) | 2026-05-12 |
-| 3. patchbay:research with tiered fetch | v2.0 | 0/TBD | Not started | - |
+| 3. patchbay:research with tiered fetch | v2.0 | 0/5 | Planned | - |
 | 4. Citation tracking + recommendations | v2.0 | 0/TBD | Not started | - |
 
 ## Coverage
@@ -107,4 +118,4 @@ All 24 v2.0 requirements map to exactly one phase. No requirements are unmapped,
 - Conversational AI / hover-citation UX (consumer of this substrate, separate skill milestone)
 
 ---
-*Last updated: 2026-05-08 — milestone v2.0 (gear-knowledge) roadmap created*
+*Last updated: 2026-05-15 — Phase 3 planned (5 plans, 3 waves)*
