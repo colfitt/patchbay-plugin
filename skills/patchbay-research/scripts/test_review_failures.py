@@ -381,11 +381,14 @@ def test_review_choice_tier3_uses_argv_subprocess(tmp_path, monkeypatch):
     target_url = "https://example.com/article-about-Chase-Bliss"
     _write_failure_line(log, url=target_url, suggested_escalation=3)
 
-    captured = {"argv": None, "kwargs": None}
+    # Capture EVERY subprocess.run call. The URL may route to the generic
+    # fallback source class (currently youtube), which may invoke yt-dlp /
+    # ffmpeg through subprocess.run during parse_to_chunks. The test cares
+    # about the `open` call specifically — we filter for it after the fact.
+    all_calls = []
 
     def _fake_run(argv, *args, **kwargs):
-        captured["argv"] = argv
-        captured["kwargs"] = kwargs
+        all_calls.append({"argv": argv, "kwargs": kwargs})
 
         class _Done:
             returncode = 0
@@ -395,9 +398,6 @@ def test_review_choice_tier3_uses_argv_subprocess(tmp_path, monkeypatch):
         return _Done()
 
     monkeypatch.setattr(subprocess, "run", _fake_run)
-
-    # Patch the subprocess reference inside the tier3_vision module — it
-    # may have its own import alias.
     if hasattr(tier3_vision, "subprocess"):
         monkeypatch.setattr(tier3_vision.subprocess, "run", _fake_run)
 
@@ -416,13 +416,21 @@ def test_review_choice_tier3_uses_argv_subprocess(tmp_path, monkeypatch):
         mcp_tools=tools,
     )
 
-    argv = captured["argv"]
-    assert argv is not None, "subprocess.run was never called by tier-3 path."
+    # Find the `open` call among all subprocess.run invocations.
+    open_calls = [
+        c for c in all_calls
+        if isinstance(c["argv"], (list, tuple)) and c["argv"] and c["argv"][0] == "open"
+    ]
+    assert open_calls, (
+        f"tier-3 path must invoke `open` via subprocess.run; got argv[0] values: "
+        f"{[c['argv'][0] if c['argv'] else None for c in all_calls]!r}"
+    )
+    call = open_calls[0]
+    argv = call["argv"]
     assert isinstance(argv, (list, tuple)), (
         "argv must be a list/tuple (shell=False idiom); "
         f"got {type(argv).__name__}: {argv!r}"
     )
-    assert argv[0] == "open", f"argv[0] must be 'open', got {argv[0]!r}"
     assert target_url in argv, (
         f"URL must be passed as a single argv element; argv={argv!r}"
     )
@@ -431,10 +439,15 @@ def test_review_choice_tier3_uses_argv_subprocess(tmp_path, monkeypatch):
     assert not interpolated, (
         f"URL appears interpolated into another argv element: {interpolated!r}"
     )
-    kwargs = captured["kwargs"] or {}
+    kwargs = call["kwargs"] or {}
     assert kwargs.get("shell", False) is False, (
         f"subprocess.run was called with shell=True: {kwargs!r}"
     )
+    # Belt-and-suspenders: NO call in this test should have shell=True.
+    for c in all_calls:
+        assert (c["kwargs"] or {}).get("shell", False) is False, (
+            f"shell=True detected in a subprocess.run call: {c!r}"
+        )
 
 
 # ---------------------------------------------------------------------------
