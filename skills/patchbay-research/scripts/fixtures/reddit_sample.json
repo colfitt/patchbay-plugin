@@ -1,0 +1,51 @@
+[
+  {
+    "kind": "Listing",
+    "data": {
+      "children": [
+        {
+          "kind": "t3",
+          "data": {
+            "id": "abc123",
+            "title": "Boss BF-3 clean-blend review",
+            "selftext": "Just spent two weeks A/B testing the Boss BF-3 against a vintage CE-2. Rhett Shull's video https://www.youtube.com/watch?v=ABC123 covers the same ground but I wanted a more practical write-up. Short version: the clean-blend mode is the killer feature.",
+            "author": "pedal_nerd",
+            "ups": 412,
+            "permalink": "/r/guitarpedals/comments/abc123/boss_bf3_cleanblend_review/"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "Listing",
+    "data": {
+      "children": [
+        {
+          "kind": "t1",
+          "data": {
+            "body": "Agreed — the clean-blend is the only reason I keep mine. Without it the BF-3 sounds like every other Boss chorus.",
+            "author": "chorusfan",
+            "ups": 87
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "body": "Try stacking it after a compressor. Totally different beast. Also see https://reverb.com/news/boss-bf3-deep-dive for a deeper electrical breakdown.",
+            "author": "studio_dad",
+            "ups": 54
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "body": "I tried this exact A/B last year. CE-2 wins for warm chorus, BF-3 wins for usability. Different tools.",
+            "author": "vintage_amp",
+            "ups": 31
+          }
+        }
+      ]
+    }
+  }
+]
