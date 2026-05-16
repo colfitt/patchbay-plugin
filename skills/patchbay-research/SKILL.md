@@ -131,6 +131,32 @@ After processing all URLs:
 
    > `feat: research [Brand Item] ([N] chunks, [M] failures)`
 
+### YouTube two-pass enrichment
+
+YouTube ingestion is a two-pass operation. The first pass (`youtube.parse_to_chunks` + `write_chunks`) writes `multimodal_segment` chunks with a placeholder vision description; the SKILL driver (you) MUST complete the second pass before the research run returns control.
+
+**First pass — what the pipeline already did:**
+
+- `yt_pipeline` invoked yt-dlp + ffmpeg in a per-run tempdir under `tempfile.gettempdir()` (NEVER under `gear_root`).
+- For each (caption window, sampled frame) pair, it emitted a `multimodal_segment` chunk with:
+  - `content.frame_description == "<<PENDING_READ_TOOL_DESCRIPTION>>"` (literal sentinel placeholder).
+  - `provenance.frame_path` set to the absolute on-disk path of the frame `.jpg`.
+  - `provenance.deep_link` carrying the `&t=<seconds>s` (or `?t=<seconds>s`) fragment.
+- `write_chunks` appended the chunks to `chunks.jsonl` and populated `cross_source_match_candidates`.
+
+**Second pass — what you do now, before exiting:**
+
+For each `multimodal_segment` chunk in this run whose `content.frame_description == "<<PENDING_READ_TOOL_DESCRIPTION>>"`:
+
+1. **Read** the local frame image at `provenance.frame_path` (use the Read tool — it accepts image paths and presents the image visually).
+2. **Generate** a one-sentence description of what is visually distinguishable on screen — gear visible, hands on controls, on-screen text/labels, anything the caption alone misses. Keep it factual and falsifiable from the image alone; do NOT speculate.
+3. **Call** `write_chunk.update_chunk_field(chunks_jsonl_path, chunk_id, "content.frame_description", <description>)` (from the Plan 01 helper) to overwrite the placeholder. This rewrite is atomic via `tempfile.mkstemp` + `os.replace`.
+4. **Continue** until no chunk in the current run still contains the sentinel.
+
+**Tempdir lifetime caveat.** Frame `.jpg` files live in the per-run tempdir, which is cleaned up via `shutil.rmtree` in `parse_to_chunks`'s try/finally. The enrichment loop above runs BEFORE that cleanup returns control. If for any reason `provenance.frame_path` does not exist on disk by the time you Read it (tempdir already cleaned up, file system race), overwrite the placeholder with the string `"frame unavailable"` rather than leaving the sentinel in place. The literal sentinel must NEVER persist in `chunks.jsonl` past the end of a research run.
+
+Full background: [`references/source-class-youtube.md`](references/source-class-youtube.md) § Two-pass model.
+
 ## Cross-source corroboration
 
 When `<gear_root>/<Brand Item>/knowledge/chunks.jsonl` already contains chunks (from a prior `patchbay:ingest` manual run or a prior `patchbay:research` web run), `write_chunks` populates `cross_source_match_candidates` on every new chunk automatically (**RESEARCH-09**).
@@ -166,6 +192,7 @@ These decisions were made with a future hover-citation UX in mind (per project m
 | `cross_source_match_note` (optional free-text) | UI renders this inline below the badge as the human-readable explanation of why two chunks corroborate. |
 | `provenance.tier_label` (added by tier-2/3 escalations in Plan 05) | UI distinguishes USER_PASTED, AUTO_TIER1, AUTO_TIER2, AUTO_TIER3 chunks visually — same source class, different trust profiles. |
 | One JSON object per line, real `json.dumps` encoder | UI streams chunks; grep / jq work directly against the file. No UI-side parser fragility. |
+| YouTube `multimodal_segment` chunks carry `provenance.frame_path` + `content.frame_description` (filled by the two-pass enrichment loop) | UI renders the frame thumbnail next to the caption text — the user sees what was on-screen when the caption was spoken (the spike-002 "effect-list-on-screen" moment). The synthesized `frame_description` doubles as the thumbnail's `alt` attribute for screen readers. Any chunk still carrying `<<PENDING_READ_TOOL_DESCRIPTION>>` renders with a "pending vision review" badge so the user can re-trigger the enrichment loop. The same `?t=<seconds>` deep_link affordance applies, jumping the embedded YouTube player to the cited moment. |
 
 ## Security notes (T-03-01 / T-03-03 / T-03-04 mitigations)
 
