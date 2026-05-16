@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: gear-knowledge
 status: executing
-stopped_at: Completed 03-04-PLAN.md (YouTube source class — multimodal, no Whisper)
-last_updated: "2026-05-16T02:20:33.109Z"
+stopped_at: 03-05 Task 1 complete; awaiting human verification on Tasks 2a (extension-INDEPENDENT smoke) and 2b (extension-DEPENDENT tier-2 escalation, likely deferred)
+last_updated: "2026-05-16T02:39:00.000Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 3
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (patchbay:research with tiered fetch) — EXECUTING
-Plan: 5 of 5
-Status: Ready to execute
+Plan: 5 of 5 — Task 1 complete (autonomous), Tasks 2a/2b awaiting human verification
+Status: Awaiting human verification (Task 2a MUST pass for phase close; Task 2b likely extension-deferred)
 Last activity: 2026-05-16
 
-Progress: [████████░░] 80%
+Progress: [████████░░] 80% — Plan 03-05 Task 1 done; phase-close gated on Task 2a approval
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [████████░░] 80%
 | Phase 03 P03-02 | 4min | 2 tasks | 5 files |
 | Phase 03 P03-03 | 5min | 2 tasks | 5 files |
 | Phase 03 P04 | 7min | 3 tasks | 8 files |
+| Phase 03 P05 (Task 1 only) | 14min | 1 task (autonomous) | 5 files created + 1 modified (SKILL.md additive) |
 
 ## Accumulated Context
 
@@ -79,6 +80,10 @@ Recent decisions affecting current work:
 - [Phase 03]: Plan 03-04: Two-pass YouTube enrichment via <<PENDING_READ_TOOL_DESCRIPTION>> sentinel + provenance.frame_path; SKILL driver Reads each frame and overwrites via write_chunk.update_chunk_field.
 - [Phase 03]: Plan 03-04: Sentinel tier-1 fetch ({needs_pipeline: True}) for YouTube — SKILL driver dispatches parse_to_chunks directly, no static GET for /watch pages.
 - [Phase 03]: Plan 03-04: VTT windows anchored to first cue start (not fixed grid) so deep_link timestamps stay surgically aligned with content.
+- [Phase 03]: Plan 03-05: Dependency-injected MCP tools (`mcp_tools: Mapping[str, Callable]`) — review_failures / tier2_chrome / tier3_vision accept tool callables as parameters so the test suite can exercise the full dispatcher without a real Chrome extension, and the SKILL driver wires `mcp__*` callables at runtime. No MCP SDK runtime dep.
+- [Phase 03]: Plan 03-05: Append-only resolution-record pattern — successful or failed escalations append a NEW JSON line; original failure entry NEVER rewritten. load_failures filters URLs whose latest record is a resolution. Preserves audit trail.
+- [Phase 03]: Plan 03-05: REGISTRY-state guard at the dispatcher — review_failures detects when test-cycle reloads have emptied source_classes.REGISTRY and reloads the cached submodules so their self-registration tail re-fires. Mirrors Plan 02's idempotency guard at the consumer level (instead of fixing four upstream test files).
+- [Phase 03]: Plan 03-05: tier_used stamping in `_parse_and_write` — every chunk gets `chunk['tier_used'] = fetch_result['tier']` before write_chunks. Defensive against parsers that hardcode tier_used=1 (Plan 04 youtube). Guarantees a tier-2 escalation records tier_used=2 in chunks.jsonl, never silently downgrades to 1.
 
 ### Pending Todos
 
@@ -91,7 +96,11 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-None yet. Architecture is heavily pre-validated by spike findings; the `spike-findings-patchbay-plugin` skill auto-loads in implementation work.
+**Open obligation: RESEARCH-05 production proof (Task 2b of Plan 03-05).** Plan 05 Task 1's automated tests fully cover the Chrome-extension precheck path (empty `list_connected_browsers` → install instructions + extension-missing resolution + NO auto-fallback). However the production proof — a real `--review-failures` run that escalates an Equipboard URL to tier 2 via the actual Claude_in_Chrome MCP and writes chunks with `tier_used=2` — is gated on Task 2b's checkpoint. The MCP is NOT available in the current execution session, so 2b is expected to be marked `status: extension-deferred` (NOT approved). RESEARCH-05 is NOT marked complete until Task 2b's extension-installed path is observed. The user can satisfy this later by installing the Claude in Chrome browser extension and re-running the `--review-failures` flow against a fresh Equipboard failure.
+
+**Phase-close gate: Task 2a of Plan 03-05.** Phase 3 cannot close until Task 2a (extension-INDEPENDENT smoke run: tier-1 Reddit success + Equipboard tier-1 failure + `--review-failures` listing + paste-manually tier-0 ingestion + cross_source_match_candidates emergence) is approved by the user.
+
+Architecture is otherwise heavily pre-validated by spike findings; the `spike-findings-patchbay-plugin` skill auto-loads in implementation work.
 
 ## Deferred Items
 
@@ -105,6 +114,6 @@ None yet. Architecture is heavily pre-validated by spike findings; the `spike-fi
 
 ## Session Continuity
 
-Last session: 2026-05-16T02:20:33.102Z
-Stopped at: Completed 03-04-PLAN.md (YouTube source class — multimodal, no Whisper)
-Resume file: None
+Last session: 2026-05-16T02:39:00.000Z
+Stopped at: 03-05 Task 1 complete; Tasks 2a (extension-INDEPENDENT, MUST pass) and 2b (extension-DEPENDENT, deferred-OK) awaiting human verification
+Resume file: .planning/phases/03-patchbay-research-with-tiered-fetch/03-05-SUMMARY.md (Tasks 2a/2b status section)
