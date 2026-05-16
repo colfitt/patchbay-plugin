@@ -67,7 +67,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [x] 03-02-PLAN.md — Source class: Reddit `.json` cheap path (RESEARCH-06)
-- [ ] 03-03-PLAN.md — Source class: Equipboard `artist_usage` + `cross_ref` chunks (RESEARCH-08)
+- [x] 03-03-PLAN.md — Source class: Equipboard `artist_usage` + `cross_ref` chunks (RESEARCH-08)
 - [ ] 03-04-PLAN.md — Source class: YouTube multimodal (yt-dlp + parse_vtt + ffmpeg + Read vision; no Whisper) (RESEARCH-07)
 
 **Wave 3** *(blocked on Wave 2 completion)*

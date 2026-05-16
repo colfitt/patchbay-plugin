@@ -4,14 +4,14 @@ milestone: v2.0
 milestone_name: gear-knowledge
 status: executing
 stopped_at: "Phase 2 verified end-to-end against Boss BF-3 — ready to plan Phase 3 (patchbay:research with tiered fetch)"
-last_updated: "2026-05-16T01:57:36.921Z"
+last_updated: "2026-05-16T02:05:54.702Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
-  percent: 40
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (patchbay:research with tiered fetch) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-05-16
 
-Progress: [████░░░░░░] 40%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [████░░░░░░] 40%
 *Updated after each plan completion*
 | Phase 03 P01 | 8min | 2 tasks | 9 files |
 | Phase 03 P03-02 | 4min | 2 tasks | 5 files |
+| Phase 03 P03-03 | 5min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Recent decisions affecting current work:
 - [Phase 03]: update_chunk_field landed in Plan 01 (not Plan 04) — Plan 04 YouTube two-pass enrichment becomes a 4-line change instead of a 4-file change; load-bearing helper deserves to ship with its tests
 - [Phase 03]: Self-registration idempotency guard — every source-class module wraps the REGISTRY append in 'if _self not in _REGISTRY' so importlib.reload cycles don't double-register
 - [Phase 03]: Chunk IDs grounded on data.id (Reddit-assigned post id), not URL slug — slugs can be edited by mods; data.id is the stable join key for re-ingest diffs
+- [Phase ?]: [Phase 03 Plan 03]: Two-pass emit pattern for citing_chunk_ids — any chunk type whose citing_chunk_ids references another chunk MUST emit AFTER the cited chunk. Plan 04 will hit this same constraint.
+- [Phase ?]: [Phase 03 Plan 03]: VERBATIM_QUOTE_MIN_CHARS = 80 — short text collapses into summary; only text >= 80 chars becomes verbatim_quote, honoring RESEARCH-08 without inventing quotes.
+- [Phase ?]: [Phase 03 Plan 03]: BeautifulSoup with html.parser (stdlib), NOT lxml — XXE/billion-laughs immune by parser choice (T-03-15/T-03-18).
 
 ### Pending Todos
 
@@ -97,6 +101,6 @@ None yet. Architecture is heavily pre-validated by spike findings; the `spike-fi
 
 ## Session Continuity
 
-Last session: 2026-05-16T01:57:32.332Z
+Last session: 2026-05-16T02:05:38.892Z
 Stopped at: Phase 2 verified end-to-end against Boss BF-3 — ready to plan Phase 3 (patchbay:research with tiered fetch)
 Resume file: None
