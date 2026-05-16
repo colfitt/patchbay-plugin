@@ -131,6 +131,61 @@ After processing all URLs:
 
    > `feat: research [Brand Item] ([N] chunks, [M] failures)`
 
+### Reviewing failures.log via `--review-failures`
+
+When invoked as `/patchbay:research --review-failures`, the skill loads
+`<gear_root>/<Brand Item>/knowledge/failures.log`, filters out entries that
+already have a later resolution record, and walks the unresolved failures
+one at a time. The full flow is documented in
+[`references/review-failures-flow.md`](references/review-failures-flow.md);
+this section is the load-bearing contract surface.
+
+**Per-failure summary line.** Each unresolved entry prints url + `reason` +
+`http_status` + `suggested_escalation`. The user then picks one of four
+choices (case-insensitive):
+
+| Choice              | What it does                                                                                |
+|---------------------|---------------------------------------------------------------------------------------------|
+| `tier-2`            | Real-browser fetch via the Claude in Chrome MCP extension                                   |
+| `tier-3`            | System-level Chrome handoff + screenshot + Claude vision; YOU Read the screenshot          |
+| `paste`             | Tier 0 — user pastes DOM text; we route it through the matched source class                |
+| `skip`              | Append a `user-skipped` resolution; never retry                                             |
+
+**No automatic fallback.** If tier-2's precheck fails (`list_connected_browsers`
+returns `[]`) OR the tier-2 fetch raises OR the tier-3 fetch raises, the
+loop appends a resolution (`extension-missing` or `tier-error`) and MOVES
+ON. It NEVER silently tries a different tier. The user retains agency.
+
+**Precheck for tier-2 is mandatory.** Before the first network call,
+`tier2_chrome.precheck_chrome_extension(mcp_tools)` runs
+`mcp__Claude_in_Chrome__list_connected_browsers`. Empty result → print install
+instructions, append `extension-missing` resolution, continue.
+
+**Resolution records are append-only.** Each user choice appends one new JSON
+line of shape:
+
+```json
+{"type": "resolution", "url": "...", "resolved_at": "ISO-8601-Z",
+ "tier_used": 0|2|3|null, "outcome": "success|user-skipped|extension-missing|tier-error",
+ "chunks_written": N}
+```
+
+The original failure entry is NEVER rewritten. `load_failures` filters out
+any failure whose URL has a later resolution record.
+
+**Tier-3 vision second pass.** `tier3_vision.fetch_tier3` returns a
+`screenshot_path` plus an empty `body`. YOU (the SKILL driver) Read that
+path, generate the page text from the screenshot, and substitute it into
+`fetch_result.body` BEFORE the dispatcher calls `parse_to_chunks`. This is
+the only place in the flow where vision-via-Read is the load-bearing
+operation; the pure-Python module returns the path and stops.
+
+**Successful escalations feed the same writer.** Tier-2, tier-3, and paste
+all dispatch to the matched source class's `parse_to_chunks`, then write
+via `write_chunks` — so `cross_source_match_candidates` is populated
+automatically against everything already in `chunks.jsonl` (RESEARCH-09).
+Every emitted chunk gets `tier_used` matching the escalation tier (2 / 3 / 0).
+
 ### YouTube two-pass enrichment
 
 YouTube ingestion is a two-pass operation. The first pass (`youtube.parse_to_chunks` + `write_chunks`) writes `multimodal_segment` chunks with a placeholder vision description; the SKILL driver (you) MUST complete the second pass before the research run returns control.
@@ -178,6 +233,9 @@ Downstream UI surfaces this as a "corroborated by N sources" badge (see § UI la
 | Network unreachable (no DNS, no route) | Append `failures.log` entry with `reason: "other"`, `suggested_escalation: "either"`. Continue. |
 | Source-class `parse_to_chunks` raises | Catch, log to failures.log with `reason: "other"`, `reason_detail` including the exception message. Continue. |
 | Unknown host (no `match_url` matches) | Route to generic source class (`REGISTRY[-1]`). It will attempt a best-effort `<h1>` + paragraph scrape. |
+| Tier-2 extension not connected (`list_connected_browsers` returns `[]`) | Print install instructions, append a resolution with `outcome: "extension-missing"`, continue to the next failure. NO automatic fallback to tier 3. (T-03-33 — consent bypass mitigation.) |
+| Tier-2 / tier-3 fetch raises mid-escalation | Append a resolution with `outcome: "tier-error"` and the tier that was attempted, continue to the next failure. NO automatic fallback to a different tier. |
+| User types an unrecognized choice at `--review-failures` prompt | Re-prompt up to 3 times, then default to `skip` with a warning. (T-03-32 — bounded retry.) |
 
 ## UI layer notes
 
@@ -193,6 +251,7 @@ These decisions were made with a future hover-citation UX in mind (per project m
 | `provenance.tier_label` (added by tier-2/3 escalations in Plan 05) | UI distinguishes USER_PASTED, AUTO_TIER1, AUTO_TIER2, AUTO_TIER3 chunks visually — same source class, different trust profiles. |
 | One JSON object per line, real `json.dumps` encoder | UI streams chunks; grep / jq work directly against the file. No UI-side parser fragility. |
 | YouTube `multimodal_segment` chunks carry `provenance.frame_path` + `content.frame_description` (filled by the two-pass enrichment loop) | UI renders the frame thumbnail next to the caption text — the user sees what was on-screen when the caption was spoken (the spike-002 "effect-list-on-screen" moment). The synthesized `frame_description` doubles as the thumbnail's `alt` attribute for screen readers. Any chunk still carrying `<<PENDING_READ_TOOL_DESCRIPTION>>` renders with a "pending vision review" badge so the user can re-trigger the enrichment loop. The same `?t=<seconds>` deep_link affordance applies, jumping the embedded YouTube player to the cited moment. |
+| `--review-failures` flow exposes exactly four per-failure choices (tier-2 / tier-3 / paste / skip) with NO auto-fallback | UI renders four explicit buttons per failure row. There is NEVER a "try all tiers" / "auto-escalate" affordance — that would violate the consent contract (T-03-33). When `list_connected_browsers` is empty, the tier-2 button is greyed-out with an inline "install Claude in Chrome extension" link, but tier-3 / paste / skip remain selectable. This is the load-bearing escalation UX — the same data, prompts, and outcomes as the CLI flow; CLI and UI never diverge. |
 
 ## Security notes (T-03-01 / T-03-03 / T-03-04 mitigations)
 
