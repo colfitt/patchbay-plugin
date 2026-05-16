@@ -18,3 +18,4 @@ REGISTRY: list = []
 # Plans 02 / 03 / 04 each append exactly one `from . import <name>` line
 # below this comment. DO NOT add source-class imports here as part of Plan 01.
 from . import reddit  # noqa: F401  (auto-registers via side effect)
+from . import equipboard  # noqa: F401  (auto-registers via side effect)
