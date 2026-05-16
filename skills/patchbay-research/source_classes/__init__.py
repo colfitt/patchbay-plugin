@@ -19,3 +19,4 @@ REGISTRY: list = []
 # below this comment. DO NOT add source-class imports here as part of Plan 01.
 from . import reddit  # noqa: F401  (auto-registers via side effect)
 from . import equipboard  # noqa: F401  (auto-registers via side effect)
+from . import youtube  # noqa: F401  (auto-registers via side effect)
