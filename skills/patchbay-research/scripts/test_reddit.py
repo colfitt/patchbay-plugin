@@ -190,11 +190,15 @@ def test_init_py_contains_reddit_append():
 
 
 def test_reddit_self_registers_into_registry():
-    # Fresh import to guarantee the side effect ran in this process.
+    # Fresh import sequence: reloading `source_classes` resets REGISTRY to
+    # `[]`, so we must also reload `reddit` to re-run its module body and
+    # re-append into the new list. This mirrors how `__init__.py`'s
+    # `from . import reddit` line would behave on a cold start.
     import importlib
     import source_classes as sc
     importlib.reload(sc)
-    from source_classes import reddit
-    assert reddit in sc.REGISTRY, (
+    from source_classes import reddit as reddit_mod
+    importlib.reload(reddit_mod)
+    assert reddit_mod in sc.REGISTRY, (
         "reddit module did not self-register into source_classes.REGISTRY"
     )
