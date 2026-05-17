@@ -132,6 +132,53 @@ def test_cross_source_matches_finds_shared_artist():
     assert "Rhett Shull" in matches
 
 
+def test_cross_source_matches_caps_runaway_titlecase_blob():
+    """Regression: in the Phase-3 production smoke, one equipboard
+    `artist_usage` chunk had a plaintext-extracted `summary` containing every
+    comma-separated artist name on the page. The TitleCase pass in
+    `_extract_names_from_content` produced 199 candidates against an existing
+    haystack that mentioned every artist — every comma-separated token
+    became a match. Even when the upstream parser is healthier, a single
+    chunk MUST NOT be able to fan out to hundreds of candidates. Pin the
+    cap at MAX_NAME_CANDIDATES (25)."""
+    from write_chunk import MAX_NAME_CANDIDATES
+
+    # Build a giant TitleCase-heavy summary that mimics the live smoke's
+    # 'artist-album-usage' megablob — every two-word capitalized token will
+    # be lifted by the TitleCase regex.
+    fake_names = [f"Artist Name{i:03d}" for i in range(300)]
+    new_chunk = {
+        "id": "eb-bf3-artist-blob",
+        "type": "artist_usage",
+        "source": "equipboard",
+        "content": {
+            "artist": "Album Usage",
+            "summary": ", ".join(fake_names),
+        },
+        "provenance": {"scraped_at": "2026-05-15T00:00:00Z"},
+    }
+    # Existing haystack contains every fake name verbatim — without a cap
+    # the bidirectional scan returns 300+ matches.
+    existing = [
+        {
+            "id": "manual-bf3-c01",
+            "type": "text",
+            "source": "manual",
+            "content": ", ".join(fake_names),
+            "provenance": {"scraped_at": "2026-05-15T00:00:00Z"},
+        }
+    ]
+    matches = compute_cross_source_matches(new_chunk, existing)
+    assert len(matches) <= MAX_NAME_CANDIDATES, (
+        f"expected <={MAX_NAME_CANDIDATES} matches; got {len(matches)} — "
+        f"runaway TitleCase extraction is not capped"
+    )
+    assert MAX_NAME_CANDIDATES <= 50, (
+        f"MAX_NAME_CANDIDATES={MAX_NAME_CANDIDATES} is too permissive — "
+        f"the whole point of the cap is to reject 100+ match clusters"
+    )
+
+
 def test_cross_source_matches_empty_when_no_overlap():
     existing = [
         {

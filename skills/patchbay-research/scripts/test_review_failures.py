@@ -678,3 +678,90 @@ def test_cross_source_match_candidates_emerges_after_escalation(
         "'Rhett Shull' in cross_source_match_candidates; got: "
         f"{[c.get('cross_source_match_candidates') for c in new_chunks]!r}"
     )
+
+
+# ---------------------------------------------------------------------------
+# tier2_chrome.fetch_tier2 — body-must-be-raw-HTML regression
+# ---------------------------------------------------------------------------
+# In the Phase-3 production smoke, `fetch_tier2` called
+# `mcp_tools["get_page_text"]` which returned plain text. The Equipboard
+# parser does `BeautifulSoup(body, "html.parser")` and needs raw HTML with
+# `<div>` / `<section>` structure to find artist blocks, used-with rollups,
+# and Similar lists. The smoke compensated by routing `javascript_tool` with
+# `document.documentElement.outerHTML` — but the production code path was
+# broken. This test pins fetch_tier2's body to raw HTML so the contract is
+# enforced in the production code, not papered over in the orchestrator.
+# ---------------------------------------------------------------------------
+
+_RAW_HTML_SENTINEL = (
+    "<!DOCTYPE html><html><head><title>Equipboard</title></head><body>"
+    "<section class=\"used-with\"><h2>Used With</h2>"
+    "<ul><li>Boss TU-3</li><li>Boss DD-3</li><li>Boss CH-1</li></ul>"
+    "</section></body></html>"
+)
+
+
+def test_fetch_tier2_body_is_raw_html_not_plaintext():
+    """`fetch_tier2` MUST return raw HTML in `body`. Downstream parsers
+    (equipboard, reddit) call BeautifulSoup(body, 'html.parser') and need
+    structural cues (`<div>`, `<section>`, `class=`) which plaintext-only
+    `get_page_text` strips. The test injects a stub MCP surface that
+    returns the same raw-HTML string a real `javascript_tool` /
+    `outerHTML` call would; the body in the returned dict must equal it
+    verbatim AND must contain at least one HTML angle-bracket tag."""
+    calls = {"select_browser": 0, "tabs_context_mcp": 0, "browser_batch": 0}
+
+    def _select_browser(**kwargs):
+        calls["select_browser"] += 1
+        return None
+
+    def _tabs_context(**kwargs):
+        calls["tabs_context_mcp"] += 1
+        return {"tabId": "tab-xyz"}
+
+    def _browser_batch(**kwargs):
+        calls["browser_batch"] += 1
+        return None
+
+    def _javascript_tool(**kwargs):
+        # Whatever the production module uses, the stub returns raw HTML.
+        return _RAW_HTML_SENTINEL
+
+    tools = _stub_mcp_tools(
+        list_connected_browsers=lambda: [{"deviceId": "abc"}],
+        select_browser=_select_browser,
+        tabs_context_mcp=_tabs_context,
+        browser_batch=_browser_batch,
+        javascript_tool=_javascript_tool,
+        get_page_text=lambda **kw: (_ for _ in ()).throw(
+            AssertionError(
+                "get_page_text MUST NOT be called from fetch_tier2 — it "
+                "returns plaintext, which downstream parsers cannot parse."
+            )
+        ),
+    )
+
+    result = tier2_chrome.fetch_tier2(
+        "https://equipboard.com/items/boss-bf-3-flanger-pedal",
+        tools,
+    )
+
+    body = result.get("body") or ""
+    assert "<html" in body.lower() and "</html>" in body.lower(), (
+        f"fetch_tier2 body is not raw HTML — got first 200 chars: {body[:200]!r}"
+    )
+    assert body == _RAW_HTML_SENTINEL, (
+        "fetch_tier2 must return the raw HTML verbatim; got a transformed "
+        f"version: {body[:200]!r}"
+    )
+    assert result["tier"] == 2
+    assert result["status"] == 200
+    assert result["url_attempted"] == (
+        "https://equipboard.com/items/boss-bf-3-flanger-pedal"
+    )
+    # The new path must wire through browser_batch + javascript_tool, not
+    # get_page_text. (get_page_text was already asserted-not-called via the
+    # stub above; this asserts the positive wiring.)
+    assert calls["select_browser"] == 1
+    assert calls["tabs_context_mcp"] == 1
+    assert calls["browser_batch"] == 1
