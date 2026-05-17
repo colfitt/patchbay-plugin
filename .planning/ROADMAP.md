@@ -71,7 +71,7 @@ Plans:
 - [x] 03-04-PLAN.md — Source class: YouTube multimodal (yt-dlp + parse_vtt + ffmpeg + Read vision; no Whisper) (RESEARCH-07)
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 03-05-PLAN.md — `--review-failures` interactive flow + tier-2 precheck + tier-3 vision (RESEARCH-04/05/09)
+- [x] 03-05-PLAN.md — `--review-failures` interactive flow + tier-2 precheck + tier-3 vision (RESEARCH-04/05/09)
 **UI hint:** no (skill outputs are JSONL + markdown only; UI rendering is a future milestone)
 
 ### Phase 4: Citation tracking + recommendations
