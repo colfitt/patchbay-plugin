@@ -83,7 +83,16 @@ Plans:
   2. URL canonicalization handles the common variants (`youtube.com/watch?v=X` ↔ `youtu.be/X`, with/without `?si=`, with/without trailing slashes) so two chunks pointing at the same video count as one citation, not two.
   3. When N (configurable, default 2) independent sources reference the same canonicalized URL, the user sees a surfaced recommendation listing the resource and the citing chunks — the citation-count threshold is observable from the user's terminal output, not buried in a log.
   4. User can mark a surfaced resource as verified, which triggers ingestion (`/patchbay:research <url>` for articles, the multimodal YT pipeline for videos) and promotes the resulting chunks to high-trust in the knowledge store.
-**Plans:** TBD
+**Plans:** 3 plans
+Plans:
+**Wave 1**
+- [ ] 04-01-PLAN.md — URL canonicalization + post-write external_resource sweep (CITATION-01, CITATION-04)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 04-02-PLAN.md — `/patchbay:research --citations <gear>` recommendation surface (CITATION-02)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 04-03-PLAN.md — `/patchbay:research --verify <gear> <url>` verified-promotion flow (CITATION-03)
 **UI hint:** no (skill outputs are JSONL + markdown only; UI rendering is a future milestone)
 
 ## Progress
@@ -96,7 +105,7 @@ Phases execute in numeric order: 2 → 3 → 4
 | 1. Build dialed-in skill | v1.0 | 1/1 | Complete | 2026-05-07 |
 | 2. Chunk schema + patchbay:ingest | v2.0 | 3/3 | Complete (VERIFIED) | 2026-05-12 |
 | 3. patchbay:research with tiered fetch | v2.0 | 0/5 | Planned | - |
-| 4. Citation tracking + recommendations | v2.0 | 0/TBD | Not started | - |
+| 4. Citation tracking + recommendations | v2.0 | 0/3 | Planned | - |
 
 ## Coverage
 
@@ -118,4 +127,4 @@ All 24 v2.0 requirements map to exactly one phase. No requirements are unmapped,
 - Conversational AI / hover-citation UX (consumer of this substrate, separate skill milestone)
 
 ---
-*Last updated: 2026-05-15 — Phase 3 planned (5 plans, 3 waves)*
+*Last updated: 2026-05-17 — Phase 4 planned (3 plans, 3 waves)*
