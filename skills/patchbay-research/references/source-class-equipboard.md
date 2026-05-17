@@ -187,6 +187,109 @@ Cited in spike-findings: `.claude/skills/spike-findings-patchbay-plugin/referenc
 }
 ```
 
+## Live-DOM compatibility
+
+The live 2026 equipboard.com pages do NOT use the semantic class names the
+synthetic fixture (`scripts/fixtures/equipboard_sample.html`) was built
+against — they ship Tailwind utility classes that the Equipboard team
+rotates on a regular cadence. The parser handles this with a two-layer
+strategy.
+
+**Primary: JSON-LD `@graph` parsing.** Every item page ships exactly one
+`<script type="application/ld+json">` block whose `@graph` includes:
+
+- a `Product` entity with `description` (used for the `text` chunk),
+- an `ItemList` entity whose `@id` ends in `#artistUsage` and whose
+  `itemListElement` is a list of `{"item": {"@type": "Person", "name",
+  "description", "subjectOf": {"name", "url"}}}`. This is the canonical
+  artist list — `_build_artist_chunks_from_jsonld` emits one
+  `artist_usage` chunk per entry,
+- plus an `ItemList #ownerInsights`, a `FAQPage`, a `BreadcrumbList`, a
+  `WebPage`, and an `Organization` (not currently consumed but reserved
+  for future enrichment).
+
+`subjectOf.url` is the YouTube backlink — when it points at
+`youtube.com` / `youtu.be` / `m.youtube.com` (re-validated via
+`urlparse`), an `external_resource` chunk is emitted with
+`citing_chunk_ids` referencing the enclosing artist's `artist_usage`
+chunk. Non-YouTube `subjectOf.url`s (Instagram, Reddit, talkbass,
+reverb.com, etc.) are captured as `verification_note` strings on the
+artist chunk.
+
+> **`json.loads` strict mode.** Equipboard embeds literal newlines inside
+> `description` string values (the descriptions are multi-line prose).
+> RFC 8259 forbids unescaped control characters in string values, so
+> `json.loads(raw)` raises. The parser calls `json.loads(raw, strict=False)`
+> — strict-False tolerates raw `\n` / `\t` inside strings. Without that
+> flag the entire JSON-LD blob is silently skipped and the parser falls
+> all the way through to the legacy synthetic-DOM path.
+
+**Fallback: live-DOM extraction for `used_with` / `similar`.** The JSON-LD
+does NOT include the Used-With rollup or the curated Similar list, so
+these are extracted from the DOM:
+
+- `_find_used_with_from_dom` reads `#eb-item-page-used-with-container`
+  (or `#usedWith`) and lifts gear names from `<a href="/items/...">`
+  anchors.
+- `_find_similar_from_dom` reads the curated container
+  `.eb-item-page-curated-similar-items-container` (or `#similarProducts`
+  as a deeper fallback). Anchor `title=` is preferred; visible text is
+  the fallback.
+
+**Legacy synthetic-DOM path.** When no JSON-LD `#artistUsage` ItemList
+is present (e.g., the original `equipboard_sample.html` fixture used by
+tests 1–11), `_parse_artists_from_dom` runs against the
+`.artist-usage` / `.artist-name` / `.verbatim-quote` class names. This
+path stays in the module purely to keep the original 11 acceptance tests
+green; new fixtures should mirror live HTML, not synthetic DOM.
+
+**Section-heading guard.** `_is_plausible_artist_name` rejects strings
+that contain `"artist usage"`, `"album usage"`, `"load more"`, `"see
+more"`, or `"show more"` (case-insensitive) — this fixes the headline
+regression from the 2026-05-17 production smoke where the parser
+captured "Album Usage" as an artist name when the live DOM selectors
+drifted out from under the heading-fallback code path.
+
+**Regression fixture.** `scripts/fixtures/equipboard_live_2026.html` is
+the verbatim HTML captured from `equipboard.com/items/boss-bf-3-flanger-pedal`
+during the 2026-05-17 production smoke. Test cases:
+`test_parse_live_2026_emits_at_least_10_named_artist_chunks`,
+`test_parse_live_2026_emits_used_with_cross_ref`,
+`test_parse_live_2026_emits_similar_in_category_cross_ref`,
+`test_parse_live_2026_emits_external_resource_for_subjectof_youtube`,
+`test_parse_live_2026_tier_used_is_two_when_fetched_via_tier2`. When
+Equipboard rotates its DOM again, replace the fixture with a fresh
+capture from the same URL and either update the JSON-LD selectors or
+the live-DOM fallback selectors (NOT both unless both layers drifted).
+
+## Tier-2 fetch contract: raw HTML, not plaintext
+
+`scripts/tier2_chrome.fetch_tier2` returns the raw HTML body
+(`document.documentElement.outerHTML`) via the MCP `javascript_tool`,
+NOT the plaintext from `get_page_text`. The pre-fix code path used
+`get_page_text`, which silently strips the JSON-LD `<script>` blocks
+along with every `class=` / `id=` attribute the live-DOM fallback
+relies on — meaning a production tier-2 fetch would have returned
+zero `artist_usage` chunks regardless of how good the selectors were.
+
+The parser does not need to care about which fetch tier produced the
+body: every successful fetch (`tier_used` 0 paste / 1 static / 2 chrome
+/ 3 vision-screenshot) must deliver raw HTML. The
+`test_fetch_tier2_body_is_raw_html_not_plaintext` test pins this
+contract.
+
+## Cross-source corroboration cap
+
+A single chunk's `cross_source_match_candidates` is capped at
+`MAX_NAME_CANDIDATES = 25` (defined in `scripts/write_chunk.py`). The
+2026-05-17 smoke produced a chunk whose match cluster blew out to 199
+entries — every comma-separated TitleCase token in a plaintext-extracted
+megablob got promoted to a candidate. The cap is defense-in-depth: the
+upstream parser is now well-behaved, but a future regression in name
+extraction should not be allowed to turn the corroboration field into a
+denial-of-readability signal. Test:
+`test_cross_source_matches_caps_runaway_titlecase_blob`.
+
 ## Security mitigations (T-03 register)
 
 | Threat ID | Mitigation site |

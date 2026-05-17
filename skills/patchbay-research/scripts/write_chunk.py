@@ -53,6 +53,20 @@ _CONTENT_NAME_FIELDS = (
 )
 
 
+# Hard upper bound on `cross_source_match_candidates` per chunk. The
+# Phase-3 production smoke surfaced a chunk with a 199-name match cluster:
+# a single equipboard `artist_usage` chunk whose `summary` was a plaintext
+# megablob of every comma-separated artist name on the page, intersected
+# against an existing-chunks haystack that also mentioned every artist.
+# Without a cap, the bidirectional TitleCase scan returns hundreds of
+# matches. Capping at 25 keeps the field useful as a corroboration hint
+# without letting it blow up into a denial-of-readability signal. If you
+# need to tune: stay <=50, since the test
+# `test_cross_source_matches_caps_runaway_titlecase_blob` pins the upper
+# bound.
+MAX_NAME_CANDIDATES = 25
+
+
 def _flatten_strings(value: Any) -> Iterable[str]:
     """Yield every string found anywhere in a nested dict/list structure."""
     if isinstance(value, str):
@@ -148,6 +162,8 @@ def compute_cross_source_matches(
 
     # Direction A: names lifted from the new chunk that exist in any prior chunk.
     for name in new_names:
+        if len(matches) >= MAX_NAME_CANDIDATES:
+            break
         if name in seen:
             continue
         if name in existing_haystack:
@@ -156,7 +172,11 @@ def compute_cross_source_matches(
 
     # Direction B: names lifted from prior chunks that reappear in the new chunk.
     for chunk in existing_chunks:
+        if len(matches) >= MAX_NAME_CANDIDATES:
+            break
         for name in _extract_names_from_content(chunk.get("content")):
+            if len(matches) >= MAX_NAME_CANDIDATES:
+                break
             if name in seen:
                 continue
             if name in new_haystack:
