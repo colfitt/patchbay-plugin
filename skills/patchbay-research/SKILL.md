@@ -13,6 +13,7 @@ Pull web-source knowledge into a gear's `chunks.jsonl` — Equipboard artist-usa
 - `skills/patchbay-research/references/failures-log-schema.md` — the locked 9-field failures.log schema (this file consumes it)
 - `skills/patchbay-research/references/source-class-registry.md` — the three-callable contract (`match_url`, `fetch_tier1`, `parse_to_chunks`) every source-class module exposes
 - `skills/patchbay-ingest/references/chunk-schema.md` — every chunk this skill writes MUST conform to the required-field set (`id`, `type`, `source`, `content`, `provenance` with `scraped_at`)
+- `skills/patchbay-research/references/citations-flow.md` — the `--citations` subcommand (Plan 04-02 output, consumed by Plan 04-03)
 
 ## Invocation patterns
 
@@ -22,6 +23,7 @@ Activate on any of these patterns:
 "/patchbay:research [gear]"            → gather candidate URLs for the gear, route + fetch each at tier 1
 "/patchbay:research [gear] [url]"      → single-URL research path; bypass discovery
 "/patchbay:research --review-failures" → load failures.log, walk the user through per-entry escalation
+"/patchbay:research --citations [gear]"   → list external resources cited by >= N independent sources (default N=2)
 "research [gear] online"               → same as bare /patchbay:research [gear]
 "find reviews for [gear]"              → same as bare /patchbay:research [gear]
 ```
@@ -185,6 +187,24 @@ all dispatch to the matched source class's `parse_to_chunks`, then write
 via `write_chunks` — so `cross_source_match_candidates` is populated
 automatically against everything already in `chunks.jsonl` (RESEARCH-09).
 Every emitted chunk gets `tier_used` matching the escalation tier (2 / 3 / 0).
+
+### Step: Surface cross-source citation recommendations (`--citations`)
+
+When invoked with `--citations <gear>`:
+
+1. Resolve `<gear>` → `<gear_root>/<Brand Item>/knowledge/chunks.jsonl` per Step 1's rules. If the folder or file does not exist, stop with the same gear-not-found guidance as Step 1.
+2. Dispatch to `scripts/citations.py`:
+
+   ```bash
+   python3 skills/patchbay-research/scripts/citations.py <chunks_path> --gear "<Brand Item>" [--threshold N] [--filter-url URL] [--json]
+   ```
+
+3. The script prints recommendations to stdout (markdown by default, JSON with `--json`). The user sees the output directly; nothing is written to disk. Empty results still print a single guidance line and the command exits 0 — silent success is not allowed.
+4. To act on a recommendation, the user runs the Plan 04-03 `--verify <gear> <url>` subcommand against the chosen canonical URL.
+
+Full subcommand reference: [`references/citations-flow.md`](references/citations-flow.md).
+
+Threshold semantics (CITATION-02): a recommendation surfaces when the `external_resource` chunk's `citing_chunk_ids` come from at least N DISTINCT `source` values (not raw count). Default N=2; override via `--threshold` flag or `PATCHBAY_CITATION_THRESHOLD` env var (flag wins).
 
 ### YouTube two-pass enrichment
 
