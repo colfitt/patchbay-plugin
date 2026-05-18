@@ -35,6 +35,11 @@ import tempfile
 from pathlib import Path
 from typing import Any, Iterable, List, Optional
 
+try:
+    from external_resource_sweep import ensure_external_resource_chunks
+except ImportError:  # pragma: no cover — package-relative fallback
+    from .external_resource_sweep import ensure_external_resource_chunks  # type: ignore
+
 
 # ---------------------------------------------------------------------------
 # Name extraction for cross-source corroboration
@@ -281,6 +286,13 @@ def write_chunks(
             f.write(json.dumps(chunk, ensure_ascii=False) + "\n")
             existing.append(chunk)
             written += 1
+
+    # CITATION-01 + CITATION-04: post-append sweep guarantees every
+    # external URL referenced from any chunk has exactly one
+    # external_resource chunk with canonical .url and complete
+    # citing_chunk_ids. Sweep failure surfaces (no try/except wrapper)
+    # because data-layer integrity beats silent partial writes.
+    ensure_external_resource_chunks(str(resolved), gear_root=gear_root)
 
     return {"written": written, "matched": matched}
 

@@ -235,14 +235,22 @@ def test_write_chunks_appends_jsonl(tmp_path):
     result = write_chunks(str(chunks_path), chunks, gear_root=str(gear_root))
     assert result["written"] == 2
 
+    # Plan 04-01: write_chunks now invokes the external_resource sweep on
+    # every append, so chunks.jsonl also gains one synthetic
+    # external_resource per unique canonical URL referenced. Filter to the
+    # originally-written text chunks for the cross_source_match assertions.
     lines = chunks_path.read_text(encoding="utf-8").splitlines()
-    assert len(lines) == 2
-    for line in lines:
+    text_lines = [
+        l for l in lines
+        if json.loads(l).get("type") == "text"
+    ]
+    assert len(text_lines) == 2
+    for line in text_lines:
         parsed = json.loads(line)
         assert "cross_source_match_candidates" in parsed
 
     # Second chunk should match the artist from the first.
-    second = json.loads(lines[1])
+    second = json.loads(text_lines[1])
     assert "Rhett Shull" in second["cross_source_match_candidates"]
 
 
