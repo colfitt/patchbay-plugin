@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: gear-knowledge
 status: completed
-stopped_at: "Phase 4 complete — citation tracking + recommendations shipped. 138/138 pytest cases pass. /patchbay:research --citations and --verify subcommands wired into SKILL.md. v2.0 milestone (gear-knowledge) complete."
-last_updated: "2026-05-18T01:40:08.481Z"
-last_activity: 2026-05-18 -- Phase 04 complete (v2.0 milestone done)
+stopped_at: "Phase 3 closed. Task 2a re-verified against post-followup-fix code and approved 2026-05-17. Task 2b (Chrome-extension tier-2 production proof for RESEARCH-05) remains deferred-OK per plan. Next: plan Phase 4 (citation tracking + recommendations)."
+last_updated: "2026-05-18T01:55:30.329Z"
+last_activity: 2026-05-18
 progress:
   total_phases: 3
-  completed_phases: 3
+  completed_phases: 2
   total_plans: 8
   completed_plans: 8
   percent: 100
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 Phase: 04 — COMPLETE
 Plan: 3 of 3
 Status: Phase 04 complete — v2.0 milestone (gear-knowledge) complete
-Last activity: 2026-05-18 -- Phase 04 verified (138/138 tests pass)
+Last activity: 2026-05-18
 
 Progress: [██████████] 100% — v2.0 (gear-knowledge) complete: chunk schema + ingest, tiered research, citation tracking + verified-promotion all shipped
 

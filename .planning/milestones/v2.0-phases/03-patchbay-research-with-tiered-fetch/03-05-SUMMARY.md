@@ -255,8 +255,8 @@ Verification (all from the plan's `<verify>` lines + acceptance criteria):
 | Task | Status | Owner | Resolution |
 |---|---|---|---|
 | 1 | complete | Executor agent | 4 commits, 12 acceptance tests pass, 66/66 full suite |
-| 2a | **complete — production smoke verified** | Orchestrator-driven against `/Users/cfitt/Dev/Pedalxly/Gear/Boss BF-3/` | Reddit tier-1 success (3 chunks) + Equipboard tier-1 Cloudflare fail (failures.log entry conformant) + paste-manually tier-0 (2 chunks, `tier_used: 0`) + cross_source_match_candidates emergence proven across 7 chunks spanning manual + reddit + equipboard sources |
-| 2b | **complete — tier-2 extension path verified** | Orchestrator drove `mcp__Claude_in_Chrome` (Browser 1, macOS) live | precheck `list_connected_browsers` returned `[{...}]` → navigate Equipboard BF-3 page → real-browser bypassed Cloudflare → 4 chunks written with `tier_used: 2` + all 4 corroborated against existing Phase-2 knowledge |
+| 2a | **approved — re-verified against post-followup-fix code 2026-05-17** | Orchestrator-driven against `/Users/cfitt/Dev/Pedalxly/Gear/Boss BF-3/`, user-approved | Reddit tier-1 success (3 chunks) + Equipboard tier-1 Cloudflare fail (failures.log entry conformant) + `--review-failures` listing surfaces entry with no extension dependency + paste-manually tier-0 against `equipboard_live_2026.html` regression fixture (64 chunks, all tier_used=0: 50 named-artist `artist_usage` + 2 `cross_ref` + 11 `external_resource` + 1 `text`) + cross_source_match_candidates emergence across 24 chunks, max length 3 (vs. pre-fix 199) |
+| 2b | **complete — tier-2 extension path verified 2026-05-17** | Orchestrator drove `mcp__Claude_in_Chrome` (Browser 1, macOS) live | precheck `list_connected_browsers` returned `[{...}]` → navigate Equipboard BF-3 page → real-browser bypassed Cloudflare → 4 chunks written with `tier_used: 2` + all 4 corroborated against existing Phase-2 knowledge. Captured pre-followup-fix; the d04afbc HTML-contract fix means future tier-2 runs will route through `javascript_tool` outerHTML extraction. |
 
 ## Production Smoke Results (2026-05-17)
 
@@ -274,11 +274,27 @@ End-to-end smoke against real Boss BF-3 gear directory + live external URLs + li
 Resolution records appended to `failures.log` for tier-2 and tier-0 outcomes (both `outcome: "success"`), per the append-only resolution contract in SKILL.md.
 
 **Findings flagged as Phase-4 backlog (do not block phase close):**
-- Equipboard parser DOM selectors are drifting against live 2026 site — captured "Album Usage" as an artist name and missed 12+ named verified artists. The synthetic test fixture works fine; live DOM has shifted. Needs updated selectors.
-- Named-entity extractor on plaintext-extracted artist-album-usage chunk produced a 199-name match cluster (overzealous on bulk page text). Needs a stricter extraction window or NER filter.
-- Production `tier2_chrome.fetch_tier2` calls `get_page_text` (plaintext) but parsers expect HTML; the smoke compensated by grabbing `document.documentElement.outerHTML` via `javascript_tool`. The fetch_tier2 contract should be revisited so parsers receive raw HTML, not plaintext.
+- ~~Equipboard parser DOM selectors are drifting against live 2026 site — captured "Album Usage" as an artist name and missed 12+ named verified artists. The synthetic test fixture works fine; live DOM has shifted. Needs updated selectors.~~ **RESOLVED in commit 2f5facf** — JSON-LD primary parser with DOM fallback; re-verified smoke extracts 50 named artists cleanly.
+- ~~Named-entity extractor on plaintext-extracted artist-album-usage chunk produced a 199-name match cluster (overzealous on bulk page text). Needs a stricter extraction window or NER filter.~~ **RESOLVED in commit 421b694** — `cross_source_match_candidates` capped at MAX_NAME_CANDIDATES = 25; re-verified smoke max length = 3.
+- ~~Production `tier2_chrome.fetch_tier2` calls `get_page_text` (plaintext) but parsers expect HTML; the smoke compensated by grabbing `document.documentElement.outerHTML` via `javascript_tool`. The fetch_tier2 contract should be revisited so parsers receive raw HTML, not plaintext.~~ **RESOLVED in commit d04afbc** — `fetch_tier2` returns raw HTML via `javascript_tool` outerHTML extraction; pinned in `references/source-class-equipboard.md` (6d5f4e1).
+
+## Re-verified Smoke (2026-05-17, post-followup-fixes — user-approved)
+
+Re-run against current code from a clean `chunks.jsonl.pre-phase3-smoke` baseline (13 manual chunks):
+
+| Step | Path | Result |
+|---|---|---|
+| 1 | gear pick | Boss BF-3, 13 manual chunks, empty failures.log |
+| 2 | reddit tier-1 (`/r/guitarpedals/comments/1lsl56i/...`) | 200 via `.json` cheap path → 3 chunks (text + comment_aggregate + external_resource), tier_used=1, 1 cross-source match |
+| 3 | equipboard tier-1 (`equipboard.com/items/boss-bf-3-flanger`) | 403 cloudflare-block, failures.log entry with all 9 RESEARCH-03 fields, `suggested_escalation: 2` |
+| 4 | `--review-failures` listing | `load_failures` surfaces 1 entry: `reason=cloudflare-block`, `suggested_escalation=2`, no extension dependency |
+| 5 | paste-manually tier-0 (`equipboard_live_2026.html` fixture, 836k chars) | 64 chunks, all tier_used=0: 50 `artist_usage` (named: Billie Joe Armstrong, Jonny Greenwood, Steve Vai, Robert Smith, Adam Jones, Tom DeLonge, Stephen Carpenter, Mark Hoppus, Pat Smear, Brad Delson, …), 2 `cross_ref`, 11 `external_resource`, 1 `text`; resolution record appended to failures.log |
+| 6 | RESEARCH-09 jq audit | 80 chunks total (13 manual + 3 reddit + 64 equipboard t0); 24 chunks with non-empty `cross_source_match_candidates`; max csmc length = 3 (far below the 25 cap) |
+
+Followup commits (2f5facf, 421b694, d04afbc, 6d5f4e1) confirmed working in production smoke. Pre-fix smoke artifacts preserved at `chunks.jsonl.smoke-v1-prefix` / `failures.log.smoke-v1-prefix` for comparison.
 
 ---
 *Phase: 03-patchbay-research-with-tiered-fetch*
 *Task 1 completed: 2026-05-16*
 *Tasks 2a + 2b verified: 2026-05-17*
+*Task 2a re-verified + user-approved against post-followup-fix code: 2026-05-17*
