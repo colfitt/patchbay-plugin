@@ -12,22 +12,22 @@ Each REQ-ID maps to exactly one phase. Coverage is verified during roadmap creat
 
 The load-bearing data layer all v2.0 skills serialize to.
 
-- [ ] **CHUNK-01**: User has one unified chunk schema across manual / YouTube / web sources, matching the shape validated in [spike-findings/chunk-schema.md](../.claude/skills/spike-findings-patchbay-plugin/references/chunk-schema.md). Source-specific fields are additive, never divergent.
-- [ ] **CHUNK-02**: Every chunk carries provenance fields (`source`, `location_anchor`, `scraped_at`, source-specific deep_link / page / timestamp_display). Citation-hover UX cannot be built without this.
-- [ ] **CHUNK-03**: User has a per-gear knowledge store at `<gear_root>/<Brand Item>/knowledge/chunks.jsonl` — append-only JSONL, one chunk per line, grep-friendly.
-- [ ] **CHUNK-04**: User has knowledge-graph chunk types: `artist_usage` (gear↔artist edges with verification source) and `cross_ref` (gear↔gear `used_with` / `similar_in_category` edges with weights).
-- [ ] **CHUNK-05**: User has `external_resource` chunks tracking external URLs (YouTube videos with creator + title, articles with domain + headline) — the data substrate for the citation-count recommendation feature.
+- [x] **CHUNK-01**: User has one unified chunk schema across manual / YouTube / web sources, matching the shape validated in [spike-findings/chunk-schema.md](../.claude/skills/spike-findings-patchbay-plugin/references/chunk-schema.md). Source-specific fields are additive, never divergent.
+- [x] **CHUNK-02**: Every chunk carries provenance fields (`source`, `location_anchor`, `scraped_at`, source-specific deep_link / page / timestamp_display). Citation-hover UX cannot be built without this.
+- [x] **CHUNK-03**: User has a per-gear knowledge store at `<gear_root>/<Brand Item>/knowledge/chunks.jsonl` — append-only JSONL, one chunk per line, grep-friendly.
+- [x] **CHUNK-04**: User has knowledge-graph chunk types: `artist_usage` (gear↔artist edges with verification source) and `cross_ref` (gear↔gear `used_with` / `similar_in_category` edges with weights).
+- [x] **CHUNK-05**: User has `external_resource` chunks tracking external URLs (YouTube videos with creator + title, articles with domain + headline) — the data substrate for the citation-count recommendation feature.
 
 ### INGEST — `patchbay:ingest` skill
 
 Manual PDF → chunks. Backbone of the gear knowledge graph.
 
-- [ ] **INGEST-01**: User can run `/patchbay:ingest <gear>` against `<gear_root>/<Brand Item>/manuals/*.pdf` and get a populated `chunks.jsonl` for that gear.
-- [ ] **INGEST-02**: All images in the manual are described — no filtering. Each image chunk has `image_category` ∈ marketing / signal-flow / panel-diagram / screen-screenshot / button-icon / icon / parameter-envelope.
-- [ ] **INGEST-03**: Multi-page PDFs are handled via Read tool batching (20 pages per call); chunks assemble correctly with no gaps.
-- [ ] **INGEST-04**: Each manual page produces 1-4 chunks split by content type and logical block (text section vs image vs control close-up). Sentence/section-level granularity, not per-page.
-- [ ] **INGEST-05**: Re-running ingest on a manual that already has chunks produces a diff and asks the user to confirm before overwriting — preserves any chunks the user has corrected.
-- [ ] **INGEST-06**: User can edit chunks directly in `chunks.jsonl` (or a per-chunk markdown export) and the corrections survive re-ingest.
+- [x] **INGEST-01**: User can run `/patchbay:ingest <gear>` against `<gear_root>/<Brand Item>/manuals/*.pdf` and get a populated `chunks.jsonl` for that gear.
+- [x] **INGEST-02**: All images in the manual are described — no filtering. Each image chunk has `image_category` ∈ marketing / signal-flow / panel-diagram / screen-screenshot / button-icon / icon / parameter-envelope.
+- [x] **INGEST-03**: Multi-page PDFs are handled via Read tool batching (20 pages per call); chunks assemble correctly with no gaps.
+- [x] **INGEST-04**: Each manual page produces 1-4 chunks split by content type and logical block (text section vs image vs control close-up). Sentence/section-level granularity, not per-page.
+- [x] **INGEST-05**: Re-running ingest on a manual that already has chunks produces a diff and asks the user to confirm before overwriting — preserves any chunks the user has corrected.
+- [x] **INGEST-06**: User can edit chunks directly in `chunks.jsonl` (or a per-chunk markdown export) and the corrections survive re-ingest.
 
 ### RESEARCH — `patchbay:research` skill
 
@@ -47,10 +47,10 @@ Multi-source web ingest with tiered fetch + user-driven escalation.
 
 The "watch this video" recommendation feedback loop.
 
-- [ ] **CITATION-01**: Every external URL referenced from any chunk produces an `external_resource` chunk with `{resource_type, creator, title, url, updated, relevance, citing_chunk_ids[]}`.
-- [ ] **CITATION-02**: When N (configurable, default 2) sources independently reference the same external resource, surface to the user as "this was referenced N times — worth verifying."
-- [ ] **CITATION-03**: User can mark a surfaced resource as verified → triggers ingestion (`/patchbay:research <url>` for articles, multimodal YT pipeline for videos) and promotes the resulting chunks to high-trust.
-- [ ] **CITATION-04**: URL canonicalization handles common variants (`youtube.com/watch?v=X` vs `youtu.be/X`, with/without `?si=`, with/without trailing slashes) before counting citations.
+- [x] **CITATION-01**: Every external URL referenced from any chunk produces an `external_resource` chunk with `{resource_type, creator, title, url, updated, relevance, citing_chunk_ids[]}`.
+- [x] **CITATION-02**: When N (configurable, default 2) sources independently reference the same external resource, surface to the user as "this was referenced N times — worth verifying."
+- [x] **CITATION-03**: User can mark a surfaced resource as verified → triggers ingestion (`/patchbay:research <url>` for articles, multimodal YT pipeline for videos) and promotes the resulting chunks to high-trust.
+- [x] **CITATION-04**: URL canonicalization handles common variants (`youtube.com/watch?v=X` vs `youtu.be/X`, with/without `?si=`, with/without trailing slashes) before counting citations.
 
 ## Future Requirements (deferred to v2.x or v3.0)
 
