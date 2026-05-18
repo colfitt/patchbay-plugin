@@ -14,6 +14,7 @@ Pull web-source knowledge into a gear's `chunks.jsonl` — Equipboard artist-usa
 - `skills/patchbay-research/references/source-class-registry.md` — the three-callable contract (`match_url`, `fetch_tier1`, `parse_to_chunks`) every source-class module exposes
 - `skills/patchbay-ingest/references/chunk-schema.md` — every chunk this skill writes MUST conform to the required-field set (`id`, `type`, `source`, `content`, `provenance` with `scraped_at`)
 - `skills/patchbay-research/references/citations-flow.md` — the `--citations` subcommand (Plan 04-02 output, consumed by Plan 04-03)
+- `skills/patchbay-research/references/verify-resource-flow.md` — the `--verify` subcommand (Plan 04-03 output, closes the Phase 4 citation loop)
 
 ## Invocation patterns
 
@@ -24,6 +25,7 @@ Activate on any of these patterns:
 "/patchbay:research [gear] [url]"      → single-URL research path; bypass discovery
 "/patchbay:research --review-failures" → load failures.log, walk the user through per-entry escalation
 "/patchbay:research --citations [gear]"   → list external resources cited by >= N independent sources (default N=2)
+"/patchbay:research --verify [gear] [url]" → mark a surfaced citation recommendation as verified; dispatch ingestion + promote chunks to trust=high
 "research [gear] online"               → same as bare /patchbay:research [gear]
 "find reviews for [gear]"              → same as bare /patchbay:research [gear]
 ```
@@ -205,6 +207,24 @@ When invoked with `--citations <gear>`:
 Full subcommand reference: [`references/citations-flow.md`](references/citations-flow.md).
 
 Threshold semantics (CITATION-02): a recommendation surfaces when the `external_resource` chunk's `citing_chunk_ids` come from at least N DISTINCT `source` values (not raw count). Default N=2; override via `--threshold` flag or `PATCHBAY_CITATION_THRESHOLD` env var (flag wins).
+
+### Step: Verify a surfaced citation recommendation (`--verify`)
+
+When invoked with `--verify <gear> <url>`:
+
+1. Resolve `<gear>` → `<gear_root>/<Brand Item>/knowledge/chunks.jsonl` per Step 1's rules.
+2. Dispatch to `scripts/verify_resource.py`:
+
+   ```bash
+   python3 skills/patchbay-research/scripts/verify_resource.py <chunks_path> --gear "<Brand Item>" --url "<url>" [--gear-root <path>]
+   ```
+
+3. The script canonicalizes the URL, locates the existing `external_resource` chunk, dispatches downstream ingestion via `url_router.route_url` (tier-1 for articles; the multimodal pipeline for YouTube via the `needs_pipeline=True` sentinel), stamps every newly emitted chunk with `trust: "high"`, and marks the external_resource chunk's `content.relevance="verified"` plus its own top-level `trust="high"` via two atomic `update_chunk_field` calls.
+4. Exit 0 on success; exit 2 if no external_resource chunk represents the URL (the user is told to run `--citations` first); exit 1 on fetch failure or `--gear-root` derivation failure.
+
+Full subcommand reference: [`references/verify-resource-flow.md`](references/verify-resource-flow.md).
+
+The trust flag (CITATION-03): chunks emitted by `--verify` carry `trust: "high"` at the chunk-dict top level. This is an additive optional schema field — chunks without `trust` remain valid. Future skills (the conversational AI) can weight `trust=high` chunks more heavily in citation-hover ranking. Only `verify_resource` sets this value; no source-class parser self-promotes its own chunks (T-04-14 mitigation).
 
 ### YouTube two-pass enrichment
 
