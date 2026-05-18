@@ -44,12 +44,17 @@ Phases moved to: [milestones/v2.0-phases/](milestones/v2.0-phases/)
 
 Run `/gsd-new-milestone` to define v3.0 scope and requirements.
 
-**Candidates surfaced during v2.0:**
-- Skill rename: `liner-notes` → `rip-off` (cosmetic; light-touch phase)
-- CITATION-02 primary-source independence (lift the same-class re-publication under-count limitation)
-- Conversational AI front-end on the gear-knowledge substrate (hover-citation UX consumer)
-- A `patchbay:soundcheck` skill (or similar) that consumes both `chunks.jsonl` stores at once
-- Multi-gear tone-graph queries / cross-gear recommendations
+**Ordered candidates (top = next, bottom = last):**
+
+1. **`patchbay:tone-chase`** — conversational pre-production partner (ARLO). Designed: [docs/specs/2026-05-18-patchbay-tone-chase-design.md](../docs/specs/2026-05-18-patchbay-tone-chase-design.md). Helps musicians finish songs with gear they own; four optional flags (`--producer`, `--engineer`, `--editor`, `--guy-in-the-chair`); Socratic-only lyric editing (no generation); per-song `ARLO.md` journal; `arlo/knowledge/` technique store; `--gas` rename from `--gas-mode`.
+2. **`patchbay:midi`** — generate `.mid` / `.syx` files, or send real-time MIDI via a small helper. Interesting and creative — moved up from longer arc.
+3. **`patchbay:soundcheck`** — first-time setup; detect or scaffold folder convention. Makes the plugin portable across users with different gear-folder layouts.
+4. **`patchbay:add-gear`** — onboard a piece of gear with a structured profile; the natural front door once `ingest` exists.
+5. **Conversational AI hover-citation UX** — the consumer of the gear-knowledge substrate. Ask a question about gear, get answers where every sentence deep-links to source. (May fold into `tone-chase`'s UI surface.)
+6. **CITATION-02 primary-source independence** — lift the v2.0 same-class re-publication under-count limitation.
+7. **Multi-gear tone-graph queries** — cross-gear recommendations walking `artist_usage` + `cross_ref` edges from Phase 3.
+8. **Skill rename:** `liner-notes` → `rip-off` (cosmetic; light-touch phase to wink at the plugin name).
+9. **`patchbay:purge`** — review inventory for sell candidates. Last on the list.
 
 ## Progress
 
@@ -67,4 +72,4 @@ Run `/gsd-new-milestone` to define v3.0 scope and requirements.
 - Bounding-box provenance — `{source, location_anchor}` is sufficient; bbox is a future precision upgrade.
 
 ---
-*Last updated: 2026-05-18 — v2.0 (gear-knowledge) milestone shipped*
+*Last updated: 2026-05-18 — v3.0 candidates ordered; `tone-chase` design committed*

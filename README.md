@@ -52,32 +52,40 @@ The big arc: build the substrate (done), then build the consumers that turn
 the substrate into a usable surface for musicians. Specifics for the next
 milestone get scoped via `/gsd-new-milestone`.
 
-### 📋 v3.0 — Candidates surfaced during v2.0 close
+### 📋 v3.0 — Ordered candidates (top = next, bottom = last)
 
-- **Skill rename:** `liner-notes` → `rip-off`. Cosmetic, light-touch phase
-  to make the plugin name itself a wink.
-- **`patchbay:soundcheck`** — first-time setup; detect or scaffold folder
-  convention. The skill that makes everything else portable across users
-  with different gear-folder layouts.
-- **`patchbay:add-gear`** — onboard a piece of gear with a structured
-  profile; the natural front door once `ingest` exists.
-- **Conversational AI hover-citation UX** — the consumer of the
-  gear-knowledge substrate. Ask a question about your gear, get answers
-  where every sentence deep-links to the source manual page, video
-  timestamp, or review paragraph.
-- **CITATION-02 primary-source independence** — lift the v2.0 known
-  limitation where same-class re-publication under-counts (the threshold
-  currently uses the citing chunk's `source` field; a future pass tracks
-  `primary_sources: list[str]` for finer-grained independence).
-- **Multi-gear tone-graph queries** — cross-gear recommendations that walk
-  the `artist_usage` + `cross_ref` edges Phase 3 already produces (e.g.
-  "what else do artists who use my Boss BF-3 also use?").
+1. **`patchbay:tone-chase`** — conversational pre-production partner
+   driven by **ARLO**, an entity whose job is to help you *finish a song
+   using gear you already own*. Four optional focus flags (`--producer`,
+   `--engineer`, `--editor`, `--guy-in-the-chair`), per-song `ARLO.md`
+   journal, workflow-as-session-opener, Socratic-only lyric editing
+   (theme suggestion, theme reminding, asks-you-why — never writes lyrics
+   for you), `--gas` rename from `--gas-mode`. Design committed:
+   [`docs/specs/2026-05-18-patchbay-tone-chase-design.md`](docs/specs/2026-05-18-patchbay-tone-chase-design.md).
+2. **`patchbay:midi`** — generate `.mid` / `.syx` files or send real-time
+   MIDI via a small helper. Moved up from the longer arc because it's
+   interesting and creative.
+3. **`patchbay:soundcheck`** — first-time setup; detect or scaffold folder
+   convention. Makes everything portable across users with different
+   gear-folder layouts.
+4. **`patchbay:add-gear`** — onboard a piece of gear with a structured
+   profile; the natural front door once `ingest` exists.
+5. **Conversational AI hover-citation UX** — the consumer of the
+   gear-knowledge substrate. Ask a question, get answers where every
+   sentence deep-links to source. May fold into `tone-chase`'s eventual
+   UI surface.
+6. **CITATION-02 primary-source independence** — lift the v2.0 known
+   limitation where same-class re-publication under-counts.
+7. **Multi-gear tone-graph queries** — cross-gear recommendations that
+   walk the `artist_usage` + `cross_ref` edges Phase 3 produces
+   (e.g. "what else do artists who use my Boss BF-3 also use?").
+8. **Skill rename:** `liner-notes` → `rip-off`. Cosmetic, light-touch phase
+   to make the plugin name itself a wink.
+9. **`patchbay:purge`** — review inventory for sell candidates. Last on the
+   list.
 
 ### 🧭 Longer arc (not committed)
 
-- **`patchbay:purge`** — review inventory for sell candidates.
-- **`patchbay:midi`** — generate `.mid` / `.syx` files, or send real-time
-  MIDI via a small helper.
 - **Whisper transcription for YouTube** — auto-captions are sufficient
   today (validated spike 002a/002c). A quality upgrade only if the
   hover-citation UX needs frame-accurate transcripts.
