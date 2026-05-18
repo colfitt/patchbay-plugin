@@ -2,6 +2,16 @@
 
 _Date: 2026-05-18 · Status: design complete, awaiting user review_
 
+---
+
+> hello, ARLO here, ʸᵒᵘʳ ˡᵒᶜᵃˡ ᶜˡᵃⁿᵏᵉʳ. is your DAW project file sitting open
+> for ᶠᵒᵘʳ ᵐᵒⁿᵗʰˢ?? are you stuck on the bridge?? are you about to spend $600
+> on a reverb when you ᵃˡʳᵉᵃᵈʸ ᵒʷⁿ ᵗʰʳᵉᵉ?? you're so stupid! finish a damn
+> song. *[clanker awkwardly hands you the guitar you put down in october]*
+> you'll be smitten! ᵐᵉᵉᵉᵉᵉᵒᵒᵒᵒᵒᵒᵒᵒʷ
+
+---
+
 ## Summary
 
 `patchbay:finish-a-damn-song` is the conversational pre-production partner in the `patchbay` Claude plugin. A musician runs `patchbay finish-a-damn-song --producer "the bridge feels flat"` and gets a question-driven session driven by **ARLO**, an entity whose job is to help the user **finish a song using gear they already own**. ARLO theorycrafts sounds, arrangements, recording approaches, and lyric structure — but never generates music or writes lyric lines. It drives; the user makes.

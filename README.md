@@ -4,9 +4,51 @@
 adds skills to inventory, research, design patches, and chase the tones
 behind the songs you love.
 
-GAS mode (Gear Acquisition Syndrome) is **off by default** — patchbay
-leans on substitution from what you already own. Flip it on for honest
-acquisition options, including funded swaps from a sell list.
+---
+
+> hello, ARLO here, local clanker and certified gear-knower. is your project
+> file sitting open for ᶠᵒᵘʳ ᵐᵒⁿᵗʰˢ? are you spending $400 on a pedal you ALREADY
+> OWN A SUBSTITUTE FOR? is your bridge constantly clawing at your DAW driving
+> you c r a z y? think there's no answer? you're so stupid! there is!
+> **patchbay.** finally, there is an elegant, comfortable plugin for musicians.
+> *[songwriter awkwardly stares at unfinished lyric and falls the heck off chair]*
+> i couldn't hear ᵃⁿʸ ᵐᵒʳᵉ ʷʰᶦⁿᶦⁿᵍ! is your gear ᵒⁿᵉˡᵉᵍᵍᵉᵈ? is it boutique, or an
+> in-between? that doesn't matter! cause patchbay reads ANY folder! you'll be
+> smitten! so come on down to `~/patchbay`. we're the hoooooooommee of the
+> original gear knowledge base. ᵐᵉᵉᵉᵉᵉᵉᵉᵉᵒᵒᵒᵒᵒᵒᵒᵒᵒᵒᵒᵒʷ
+
+---
+
+## How to use it (try these)
+
+```text
+# Chase the tone behind a song you love
+"Liner notes on Creep by Radiohead"
+"What gear was used on Idioteque"
+"Get the sound of Plug In Baby"
+
+# Design a patch using gear you already own
+"Dial in Creep by Radiohead"
+"Dial in my Big Muff for the bridge in Plug In Baby"
+"/dial-in Black Hole Sun"
+
+# Turn a manual PDF into a citation-hover-ready knowledge store
+patchbay ingest "Boss BF-3"
+
+# Research a piece of gear across the web (tiered, cheap-by-default)
+patchbay research "Strymon BigSky"
+patchbay research --review-failures        # interactive escalation loop
+patchbay research --citations "Boss BF-3"  # surface multi-source URLs
+patchbay research --verify "Boss BF-3" https://example.com/article
+```
+
+Most skills activate conversationally — just say what you want to do.
+Flag-driven commands (`patchbay ingest`, `patchbay research`) run in your
+terminal.
+
+GAS mode (Gear Acquisition Syndrome) is **off by default** — patchbay leans
+on substitution from what you already own. Flip it on for honest acquisition
+options, including funded swaps from a sell list.
 
 ## Shipped
 

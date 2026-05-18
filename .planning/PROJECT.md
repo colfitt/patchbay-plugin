@@ -23,9 +23,9 @@ Every artifact this plugin produces must remain a useful, source-cited markdown 
 - 138 pytest cases green; 24/24 v2.0 requirements satisfied; goal-backward verification + integration check both passed
 
 **Next milestone goals (v3.0, draft):**
-- Pun rename: `liner-notes` → `rip-off` (skill rename across SKILL.md, plugin.json, CLAUDE.md routing)
-- Conversational AI front-end on the gear-knowledge substrate (hover-citation UX consumer)
-- Either: hover-cite renderer / a `patchbay:soundcheck` skill / cross-gear recommendations / multi-gear tone-graph queries (TBD at `/gsd-new-milestone`)
+- Skill rename: `liner-notes` → `tone-chase` (cosmetic; prerequisite for the conversational skill). Across SKILL.md, plugin.json, CLAUDE.md routing.
+- **`patchbay:finish-a-damn-song`** — conversational pre-production partner driven by **ARLO**. Design committed: [`docs/specs/2026-05-18-patchbay-finish-a-damn-song-design.md`](../docs/specs/2026-05-18-patchbay-finish-a-damn-song-design.md). Four optional flags (`--producer`, `--engineer`, `--editor`, `--guy-in-the-chair`), per-song `ARLO.md` journal, Socratic-only lyric editing (no generation), `--gas` rename from `--gas-mode`.
+- Other candidates ordered in [`ROADMAP.md`](ROADMAP.md): `patchbay:midi`, `patchbay:soundcheck`, `patchbay:add-gear`, hover-citation UX, CITATION-02 primary-source independence, multi-gear tone-graph queries, `patchbay:purge`.
 
 ## Requirements
 
@@ -77,7 +77,7 @@ Plugin lives at `/Users/cfitt/Dev/patchbay-plugin`. Skills follow `skills/<skill
 ## Constraints
 
 - **Format**: Clock-position knob values (`2:00`, `9:00`) — load-bearing for future UI knob rendering. No format migration acceptable.
-- **Routing**: `dialed-in` only runs when a SongProfile.md exists; otherwise returns a recoverable empty-state message pointing the user back to `liner-notes`/`rip-off`.
+- **Routing**: `dialed-in` only runs when a SongProfile.md exists; otherwise returns a recoverable empty-state message pointing the user back to `liner-notes` (renaming to `tone-chase` in v3.0).
 - **Citation**: Source files cached under `dial-in/sources/<target-gear-slug>-<YYYY-MM-DD>.md`; 30-day cache window before re-fetch.
 - **Idempotence**: Re-running on an existing dial-in surfaces a 4-option re-run menu (Refresh / Extend / Leave it / Start over).
 - **Chunk schema** (v2.0+): additive only — new fields fine, no breaking renames or removals. All chunks must carry `id`, `type`, `source`, `content`, `provenance`.
@@ -124,4 +124,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-18 — v2.0 (gear-knowledge) shipped*
+*Last updated: 2026-05-18 — v3.0 direction set: `finish-a-damn-song` (ARLO) spec'd; `liner-notes` → `tone-chase` rename queued as prereq*
