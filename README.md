@@ -12,23 +12,87 @@ to lean on substitution from your existing rig. When you do want to add or
 swap, GAS mode surfaces honest acquisition options — including funded swaps
 from a sell list you maintain yourself.
 
-## Skills
+## Shipped Skills
 
-- **`patchbay:soundcheck`** — first-time setup; detect or scaffold folder convention.
-- **`patchbay:add-gear`** — onboard a piece of gear with a structured profile.
-- **`patchbay:purge`** — review inventory for sell candidates.
-- **`patchbay:ingest`** — pull a manual, article, video, or book into research.
-- **`patchbay:research`** — deep gear or technique research.
-- **`patchbay:liner-notes`** — research the rig and tone behind a song or artist.
-- **`patchbay:dial-in`** — design or recall a patch.
-- **`patchbay:midi`** — generate `.mid` / `.syx` files, or send real-time MIDI via a small helper.
+- **`patchbay:liner-notes`** — research the rig and tone behind a song or
+  artist. Produces a `SongProfile.md` with sourced gear breakdown and an
+  inventory-matched Applied section. *(v1.0)*
+- **`patchbay:dialed-in`** — design or recall a patch. Saves dial-in
+  sessions as structured markdown (knob positions, toggle states, signal
+  chain, technique notes) anchored to a specific song + gear substitution.
+  *(v1.0)*
+- **`patchbay:ingest`** — turn a gear manual PDF into a populated,
+  schema-valid `chunks.jsonl` for that gear. Every image described, every
+  page provenance-tracked, citation-hover ready. *(v2.0)*
+- **`patchbay:research`** — multi-source web ingest (Equipboard, Reddit,
+  articles, YouTube) into the same per-gear knowledge store. Cheap-by-default
+  + user-driven escalation through a tier-1 / 2 / 3 / 0 fetch ladder. No
+  auto-fallback — failures go to `failures.log`, you decide what to escalate.
+  *(v2.0)*
+  - `--review-failures` — interactive escalation loop
+  - `--citations <gear>` — surface URLs referenced by N distinct sources
+  - `--verify <gear> <url>` — mark a recommendation verified → ingest +
+    promote to high-trust
 
 ## Status
 
-In design. See [docs/specs/](docs/specs/) for the design specs and
-[docs/origin.md](docs/origin.md) for the brainstorming history.
+**Shipped:**
+- ✅ **v1.0 dialed-in** — `liner-notes` + `dialed-in` skills (2026-05-07)
+- ✅ **v2.0 gear-knowledge** — chunk schema + per-gear knowledge store +
+  `ingest` + `research` + citation tracking (2026-05-18)
 
-The first skill being implemented is `patchbay:liner-notes`.
+138 pytest cases green, 24/24 v2.0 requirements satisfied. See
+[`.planning/MILESTONES.md`](.planning/MILESTONES.md) for the full delivery
+log and [`.planning/RETROSPECTIVE.md`](.planning/RETROSPECTIVE.md) for what
+worked / what didn't.
+
+## Roadmap
+
+The big arc: build the substrate (done), then build the consumers that turn
+the substrate into a usable surface for musicians. Specifics for the next
+milestone get scoped via `/gsd-new-milestone`.
+
+### 📋 v3.0 — Candidates surfaced during v2.0 close
+
+- **Skill rename:** `liner-notes` → `rip-off`. Cosmetic, light-touch phase
+  to make the plugin name itself a wink.
+- **`patchbay:soundcheck`** — first-time setup; detect or scaffold folder
+  convention. The skill that makes everything else portable across users
+  with different gear-folder layouts.
+- **`patchbay:add-gear`** — onboard a piece of gear with a structured
+  profile; the natural front door once `ingest` exists.
+- **Conversational AI hover-citation UX** — the consumer of the
+  gear-knowledge substrate. Ask a question about your gear, get answers
+  where every sentence deep-links to the source manual page, video
+  timestamp, or review paragraph.
+- **CITATION-02 primary-source independence** — lift the v2.0 known
+  limitation where same-class re-publication under-counts (the threshold
+  currently uses the citing chunk's `source` field; a future pass tracks
+  `primary_sources: list[str]` for finer-grained independence).
+- **Multi-gear tone-graph queries** — cross-gear recommendations that walk
+  the `artist_usage` + `cross_ref` edges Phase 3 already produces (e.g.
+  "what else do artists who use my Boss BF-3 also use?").
+
+### 🧭 Longer arc (not committed)
+
+- **`patchbay:purge`** — review inventory for sell candidates.
+- **`patchbay:midi`** — generate `.mid` / `.syx` files, or send real-time
+  MIDI via a small helper.
+- **Whisper transcription for YouTube** — auto-captions are sufficient
+  today (validated spike 002a/002c). A quality upgrade only if the
+  hover-citation UX needs frame-accurate transcripts.
+- **Bounding-box provenance** — `{source, location_anchor}` is sufficient
+  for now; bbox-level deep links are a future precision upgrade.
+
+### Out of scope
+
+- **User taste profile** — independent of the substrate; intentionally
+  deferred. Seed at [`seeds/user-taste-profile.md`](.planning/seeds/user-taste-profile.md).
+- **Tier-2 extension auto-install** — production detects an empty
+  `list_connected_browsers` and surfaces an install hint; no auto-install.
+
+See [`.planning/ROADMAP.md`](.planning/ROADMAP.md) for the live roadmap and
+[`docs/specs/`](docs/specs/) for the original design specs.
 
 ## Project-agnostic by design
 
@@ -39,6 +103,10 @@ but adapts to flat folders or a custom convention via a per-project
 `patchbay.yml`.
 
 Pedalxly is the canonical test case.
+
+After v2.0, every gear-related skill writes into a unified per-gear
+knowledge store at `<gear_root>/<Brand Item>/knowledge/chunks.jsonl` —
+append-only JSONL, schema-validated, citation-ready.
 
 ## License
 
