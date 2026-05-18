@@ -1,10 +1,10 @@
-# Design: `patchbay:tone-chase`
+# Design: `patchbay:finish-a-damn-song`
 
 _Date: 2026-05-18 · Status: design complete, awaiting user review_
 
 ## Summary
 
-`patchbay:tone-chase` is the conversational pre-production partner in the `patchbay` Claude plugin. A musician runs `patchbay tone-chase --producer "the bridge feels flat"` and gets a question-driven session driven by **ARLO**, an entity whose job is to help the user **finish a song using gear they already own**. ARLO theorycrafts sounds, arrangements, recording approaches, and lyric structure — but never generates music or writes lyric lines. It drives; the user makes.
+`patchbay:finish-a-damn-song` is the conversational pre-production partner in the `patchbay` Claude plugin. A musician runs `patchbay finish-a-damn-song --producer "the bridge feels flat"` and gets a question-driven session driven by **ARLO**, an entity whose job is to help the user **finish a song using gear they already own**. ARLO theorycrafts sounds, arrangements, recording approaches, and lyric structure — but never generates music or writes lyric lines. It drives; the user makes.
 
 Tagline: *"Use the clanker to make you the musician again. Take the power back."*
 
@@ -18,13 +18,13 @@ ARLO is a clanker. It knows it. It pushes the user toward completion, asks excel
 
 `patchbay` is a Claude plugin for musicians' personal studio knowledge bases (see [`README.md`](../../README.md)). Skills compose through the filesystem only — no direct skill-to-skill calls.
 
-Existing skills `tone-chase` builds on:
-- `patchbay:liner-notes` — produces `SongProfile.md` per song (tone breakdown + inventory match)
+Existing skills `finish-a-damn-song` builds on:
+- `patchbay:tone-chase` — produces `SongProfile.md` per song (tone breakdown + inventory match)
 - `patchbay:dialed-in` — produces `dialed-in/*.md` per song (knob positions, signal chains)
 - `patchbay:ingest` — turns manuals into chunks
 - `patchbay:research` — multi-source web ingest with tiered cost discipline
 
-`tone-chase` reads the artifacts those skills produce. It adds the **conversational session layer** that turns a folder of static research and patches into a working pre-production loop.
+`finish-a-damn-song` reads the artifacts those skills produce. It adds the **conversational session layer** that turns a folder of static research and patches into a working pre-production loop.
 
 ## Architecture & dependencies
 
@@ -32,12 +32,12 @@ Existing skills `tone-chase` builds on:
 |---|---|---|
 | `references/inventory.md` | Read user's owned gear/software | Plugin-level |
 | `references/convention.md` | Detect project folder shape | Plugin-level |
-| `Songs/<Artist>/<song>/SongProfile.md` | Read tone research (if exists) | `liner-notes` |
+| `Songs/<Artist>/<song>/SongProfile.md` | Read tone research (if exists) | `tone-chase` |
 | `Songs/<Artist>/<song>/dialed-in/*.md` | Read patch files (if exist) | `dialed-in` |
-| `Songs/<Artist>/<song>/ARLO.md` | Read/write session journal | `tone-chase` (this skill) |
-| `<root>/arlo/knowledge/chunks.jsonl` | Read technique corpus | `tone-chase` (this skill) |
+| `Songs/<Artist>/<song>/ARLO.md` | Read/write session journal | `finish-a-damn-song` (this skill) |
+| `<root>/arlo/knowledge/chunks.jsonl` | Read technique corpus | `finish-a-damn-song` (this skill) |
 | `<gear_root>/<Brand Item>/knowledge/chunks.jsonl` | Read gear-specific knowledge | `ingest` / `research` |
-| `<root>/arlo/workflows/*.md` | Read workflow templates | `tone-chase` (this skill) |
+| `<root>/arlo/workflows/*.md` | Read workflow templates | `finish-a-damn-song` (this skill) |
 | `patchbay:research` (sibling skill) | Invoked on user-approved gaps | `research` |
 
 ## Mission constraints (hard rules)
@@ -52,15 +52,15 @@ These are non-negotiable. The skill is built around them.
 ## CLI surface
 
 ```
-patchbay tone-chase                                    # ARLO broad, suggests a flag
-patchbay tone-chase --producer "bridge feels flat"     # arrangement / sound design
-patchbay tone-chase --engineer "mic'ing the cab"       # mic technique, signal chain
-patchbay tone-chase --editor "second verse meter"      # lyric editing (Socratic)
-patchbay tone-chase --guy-in-the-chair                 # session hygiene / organization
-patchbay tone-chase --gas                              # turn GAS on for this session
-patchbay tone-chase --auto-research                    # auto-fire tier-1 research
-patchbay tone-chase --song "Radiohead/Creep"           # bind to a specific song
-patchbay tone-chase --research-workflow "<query>"      # research a songwriting workflow
+patchbay finish-a-damn-song                                    # ARLO broad, suggests a flag
+patchbay finish-a-damn-song --producer "bridge feels flat"     # arrangement / sound design
+patchbay finish-a-damn-song --engineer "mic'ing the cab"       # mic technique, signal chain
+patchbay finish-a-damn-song --editor "second verse meter"      # lyric editing (Socratic)
+patchbay finish-a-damn-song --guy-in-the-chair                 # session hygiene / organization
+patchbay finish-a-damn-song --gas                              # turn GAS on for this session
+patchbay finish-a-damn-song --auto-research                    # auto-fire tier-1 research
+patchbay finish-a-damn-song --song "Radiohead/Creep"           # bind to a specific song
+patchbay finish-a-damn-song --research-workflow "<query>"      # research a songwriting workflow
 ```
 
 **Flags are optional focus hints, not required modes.** ARLO is broad by default and can suggest a flag mid-session: *"this is becoming an engineering question — want me to focus as `--engineer`?"*
@@ -85,7 +85,7 @@ If `arlo.tone:` is set, ARLO reads it as system context on session start and let
 
 ## Knowledge architecture
 
-`tone-chase` introduces a **second top-level knowledge store** alongside the v2.0 per-gear stores:
+`finish-a-damn-song` introduces a **second top-level knowledge store** alongside the v2.0 per-gear stores:
 
 ```
 <root>/
@@ -240,7 +240,7 @@ The user can change workflow mid-song if they pivot. Change is logged to the Ses
 
 Two paths to populate this folder:
 
-1. **Research workflow** — `patchbay tone-chase --research-workflow "nick cave lyric method"` (or ARLO offers to research mid-session via the standard A-mode pattern). Produces both a `.md` template file in `arlo/workflows/` and chunks ingested into `arlo/knowledge/`.
+1. **Research workflow** — `patchbay finish-a-damn-song --research-workflow "nick cave lyric method"` (or ARLO offers to research mid-session via the standard A-mode pattern). Produces both a `.md` template file in `arlo/workflows/` and chunks ingested into `arlo/knowledge/`.
 2. **User-authored** — drop your own `.md` describing how you work. ARLO auto-discovers any file in `workflows/`. Reference as `workflow: my-process` in any song's `ARLO.md` frontmatter.
 
 User-authored templates can override the shipped six workflows. The frontmatter `workflow:` field accepts any filename (without extension) found in the folder.
@@ -259,11 +259,11 @@ User approves → ARLO shells out to `patchbay:research` → resumes the convers
 
 ## GAS mode
 
-**Renamed:** `--gas-mode` → `--gas` everywhere, including `liner-notes` and `patchbay.yml`. A backward-compat shim reads `gas_mode` from existing `patchbay.yml` files if `gas` is unset; the shim logs a one-time deprecation notice suggesting the user update the key.
+**Renamed:** `--gas-mode` → `--gas` everywhere, including `tone-chase` and `patchbay.yml`. A backward-compat shim reads `gas_mode` from existing `patchbay.yml` files if `gas` is unset; the shim logs a one-time deprecation notice suggesting the user update the key.
 
 **Default:** off. Set globally in `patchbay.yml` (`arlo.gas: true|false`, inherits from top-level `gas:` if not specified). `--gas` flag overrides per-invocation. Mid-session flip supported (`turn on gas` / `/gas on`).
 
-**Behavior (inherits from `liner-notes`):**
+**Behavior (inherits from `tone-chase`):**
 - **GAS off, real gap detected:** one-line nudge in conversation: *"To get that shimmer reverb you're describing, you'd need a reverb with a pitch-shifter — you don't own one. Toggle `--gas` for options."* Cosmetic mismatches don't count as gaps.
 - **GAS on:** ARLO names 2–3 acquisition candidates inline with price tiers and (if `Purge.md` exists) funded-swap math.
 
@@ -300,6 +300,17 @@ These are explicitly **not** in this skill, by design:
 - **Real-time audio analysis.** Text-based theorycraft only. No DAW integration, no audio file inspection, no spectrum analysis.
 - **Automatic tier-2/3 research.** Even with `--auto-research`, escalation past tier-1 requires user confirmation.
 
+## Prerequisite: `liner-notes` → `tone-chase` rename
+
+This spec references **`patchbay:tone-chase`** as the producer of `SongProfile.md`. That artifact is currently produced by the shipped v1.0 skill `patchbay:liner-notes`. Before (or as part of) this phase, the v1.0 skill must be renamed:
+
+- `skills/liner-notes/` → `skills/tone-chase/`
+- All internal references inside the skill (SKILL.md, references, etc.) updated
+- `patchbay.yml.example` keys updated if any reference the old name
+- The activation patterns in `tone-chase`'s SKILL.md retain "liner notes on X" as an alias for backward-compat (users have muscle memory) but the canonical name becomes `tone-chase`
+
+The rename is a small, cosmetic phase. It should ship either immediately before `finish-a-damn-song` or as its first plan.
+
 ## Open implementation questions
 
 To be resolved during `/gsd-plan-phase`:
@@ -308,6 +319,7 @@ To be resolved during `/gsd-plan-phase`:
 2. **A-seed source list.** The user picks the ~5 canonical sources for the day-one seed before planning starts.
 3. **`gas_mode` → `gas` migration shim details.** Where the shim lives, how the deprecation notice is surfaced, whether and when to remove the shim.
 4. **Workflow template format.** Whether `workflows/*.md` files have required frontmatter or are free-form. Probably free-form with optional frontmatter, but worth confirming during planning.
+5. **Scope of the `liner-notes` → `tone-chase` rename.** Whether it ships as its own phase first, or as plan #1 of this phase.
 
 ## Future / longer arc (not committed)
 
