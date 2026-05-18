@@ -86,13 +86,13 @@ Plans:
 **Plans:** 3 plans
 Plans:
 **Wave 1**
-- [ ] 04-01-PLAN.md — URL canonicalization + post-write external_resource sweep (CITATION-01, CITATION-04)
+- [x] 04-01-PLAN.md — URL canonicalization + post-write external_resource sweep (CITATION-01, CITATION-04)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 04-02-PLAN.md — `/patchbay:research --citations <gear>` recommendation surface (CITATION-02)
+- [x] 04-02-PLAN.md — `/patchbay:research --citations <gear>` recommendation surface (CITATION-02)
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 04-03-PLAN.md — `/patchbay:research --verify <gear> <url>` verified-promotion flow (CITATION-03)
+- [x] 04-03-PLAN.md — `/patchbay:research --verify <gear> <url>` verified-promotion flow (CITATION-03)
 **UI hint:** no (skill outputs are JSONL + markdown only; UI rendering is a future milestone)
 
 ## Progress

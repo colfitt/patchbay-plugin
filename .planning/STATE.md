@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: gear-knowledge
-status: ready_to_plan
-stopped_at: 03-05 Task 1 complete; awaiting human verification on Tasks 2a (extension-INDEPENDENT smoke) and 2b (extension-DEPENDENT tier-2 escalation, likely deferred)
-last_updated: "2026-05-16T02:39:00.000Z"
-last_activity: 2026-05-16
+status: completed
+stopped_at: "Phase 4 complete — citation tracking + recommendations shipped. 138/138 pytest cases pass. /patchbay:research --citations and --verify subcommands wired into SKILL.md. v2.0 milestone (gear-knowledge) complete."
+last_updated: "2026-05-18T01:40:08.481Z"
+last_activity: 2026-05-18 -- Phase 04 complete (v2.0 milestone done)
 progress:
   total_phases: 3
-  completed_phases: 1
-  total_plans: 5
-  completed_plans: 4
-  percent: 33
+  completed_phases: 3
+  total_plans: 8
+  completed_plans: 8
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Every artifact this plugin produces must remain a useful, source-cited markdown file in the user's local filesystem — searchable today, renderable as UI tomorrow.
-**Current focus:** Phase 03 — patchbay:research with tiered fetch
+**Current focus:** Phase 04 — citation-tracking-recommendations
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-05-17
+Phase: 04 — COMPLETE
+Plan: 3 of 3
+Status: Phase 04 complete — v2.0 milestone (gear-knowledge) complete
+Last activity: 2026-05-18 -- Phase 04 verified (138/138 tests pass)
 
-Progress: [████████░░] 80% — Plan 03-05 Task 1 done; phase-close gated on Task 2a approval
+Progress: [██████████] 100% — v2.0 (gear-knowledge) complete: chunk schema + ingest, tiered research, citation tracking + verified-promotion all shipped
 
 ## Performance Metrics
 
@@ -99,7 +99,7 @@ Recent decisions affecting current work:
 
 **Open obligation: RESEARCH-05 production proof (Task 2b of Plan 03-05).** Plan 05 Task 1's automated tests fully cover the Chrome-extension precheck path (empty `list_connected_browsers` → install instructions + extension-missing resolution + NO auto-fallback). However the production proof — a real `--review-failures` run that escalates an Equipboard URL to tier 2 via the actual Claude_in_Chrome MCP and writes chunks with `tier_used=2` — is gated on Task 2b's checkpoint. The MCP is NOT available in the current execution session, so 2b is expected to be marked `status: extension-deferred` (NOT approved). RESEARCH-05 is NOT marked complete until Task 2b's extension-installed path is observed. The user can satisfy this later by installing the Claude in Chrome browser extension and re-running the `--review-failures` flow against a fresh Equipboard failure.
 
-**Phase-close gate: Task 2a of Plan 03-05.** Phase 3 cannot close until Task 2a (extension-INDEPENDENT smoke run: tier-1 Reddit success + Equipboard tier-1 failure + `--review-failures` listing + paste-manually tier-0 ingestion + cross_source_match_candidates emergence) is approved by the user.
+**Phase-close gate: Task 2a of Plan 03-05.** RESOLVED 2026-05-17. Smoke re-run against post-followup-fix code (commits 2f5facf, 421b694, d04afbc, 6d5f4e1): tier-1 Reddit success (3 chunks, tier_used=1), Equipboard tier-1 cloudflare-block (failures.log entry with all 9 fields + suggested_escalation=2), `--review-failures` listing surfaces entry cleanly with no extension dependency, paste-manually tier-0 against the `equipboard_live_2026.html` regression fixture produced 64 chunks (50 named-artist `artist_usage` + 2 `cross_ref` + 11 `external_resource` + 1 `text`, all tier_used=0), and 24 chunks have non-empty `cross_source_match_candidates` with max length 3 — far below the 25 cap (vs. the 199-name overshoot in the pre-fix smoke). User approved.
 
 Architecture is otherwise heavily pre-validated by spike findings; the `spike-findings-patchbay-plugin` skill auto-loads in implementation work.
 
@@ -115,6 +115,6 @@ Architecture is otherwise heavily pre-validated by spike findings; the `spike-fi
 
 ## Session Continuity
 
-Last session: 2026-05-16T02:39:00.000Z
-Stopped at: 03-05 Task 1 complete; Tasks 2a (extension-INDEPENDENT, MUST pass) and 2b (extension-DEPENDENT, deferred-OK) awaiting human verification
-Resume file: .planning/phases/03-patchbay-research-with-tiered-fetch/03-05-SUMMARY.md (Tasks 2a/2b status section)
+Last session: 2026-05-17T18:05:00.000Z
+Stopped at: Phase 3 closed. Task 2a re-verified against post-followup-fix code and approved 2026-05-17. Task 2b (Chrome-extension tier-2 production proof for RESEARCH-05) remains deferred-OK per plan. Next: plan Phase 4 (citation tracking + recommendations).
+Resume file: .planning/phases/03-patchbay-research-with-tiered-fetch/03-05-SUMMARY.md (Tasks 2a/2b status section — updated)
