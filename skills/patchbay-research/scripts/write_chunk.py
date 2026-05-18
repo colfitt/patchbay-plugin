@@ -257,6 +257,8 @@ def write_chunks(
     chunks_jsonl_path: str,
     new_chunks: list[dict],
     gear_root: Optional[str] = None,
+    *,
+    trust: Optional[str] = None,
 ) -> dict:
     """Append `new_chunks` to `chunks_jsonl_path`, populating cross-source matches.
 
@@ -264,6 +266,12 @@ def write_chunks(
       1. Compute `cross_source_match_candidates` against existing chunks +
          every new chunk already written in this batch.
       2. Append the chunk as a single `json.dumps` line.
+
+    `trust` (Plan 04-03, CITATION-03): when a non-empty string is supplied,
+    every emitted chunk is stamped with `chunk["trust"] = trust` BEFORE the
+    JSONL append. Used by verify_resource to promote chunks to high-trust on
+    user-marked verified resources. Empty string or None = no stamping
+    (backward-compatible with all Phase 3 + Plan 04-01 callers).
 
     Returns `{"written": N, "matched": M}` where M counts chunks with at least
     one cross-source match.
@@ -278,6 +286,12 @@ def write_chunks(
     with open(resolved, "a", encoding="utf-8") as f:
         for raw_chunk in new_chunks:
             chunk = copy.deepcopy(raw_chunk)
+            # Plan 04-03: stamp trust at the top level when a non-empty
+            # string is supplied. Empty string = no stamping (treated like
+            # None) so callers can pass through an optional config value
+            # without a None-check.
+            if isinstance(trust, str) and trust:
+                chunk["trust"] = trust
             matches = compute_cross_source_matches(chunk, existing)
             chunk["cross_source_match_candidates"] = matches
             if matches:
